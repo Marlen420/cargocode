@@ -21,8 +21,8 @@ export class AuthService {
     if (user) {
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
-        const { password, ...userData } = user;
-        return { access_token: this.jwtService.sign(userData) };
+        delete user.password;
+        return { access_token: this.jwtService.sign(user) };
       }
     }
     throw new BadRequestException('Invalid login or password');

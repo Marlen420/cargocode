@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { DeleteResult } from 'typeorm';
 import {
@@ -10,6 +9,10 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { CreateShipperDto } from './dto/create-shipper.dto';
+import { ShipperEntity } from './entities/shipper.entity';
+import { CarrierEntity } from './entities/carrier.entity';
+import { CreateCarrierDto } from './dto/create-carrier.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -17,15 +20,30 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: CreateCarrierDto })
   @ApiResponse({
     status: 201,
-    description: 'The user has been successfully created',
+    description: 'The carrier has been successfully created',
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<string> {
-    return await this.usersService.create(createUserDto);
+  @Post('carrier')
+  async createCarrier(
+    @Body() createCarrierDto: CreateCarrierDto,
+  ): Promise<CarrierEntity> {
+    return await this.usersService.createCarrier(createCarrierDto);
+  }
+  @ApiOperation({ summary: 'Create a new shipper' })
+  @ApiBody({ type: CreateShipperDto })
+  @ApiResponse({
+    status: 201,
+    description: 'The shipper has been successfully created',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @Post('shipper')
+  async createShipper(
+    @Body() createShipperDto: CreateShipperDto,
+  ): Promise<ShipperEntity> {
+    return this.usersService.createShipper(createShipperDto);
   }
 
   @ApiOperation({ summary: 'Get all users' })
