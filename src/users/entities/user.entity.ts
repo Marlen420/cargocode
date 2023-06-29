@@ -1,8 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Role } from '../enums/roles.enum';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { RolesEnum } from '../enums/roles.enum';
+import { CarrierEntity } from './carrier.entity';
+import { ShipperEntity } from './shipper.entity';
 
 @Entity()
-export abstract class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -11,10 +13,14 @@ export abstract class User {
   lastname: string;
   @Column({ unique: true, nullable: false })
   phone: string;
-  @Column({ unique: true, nullable: false })
+  @Column({ unique: true, nullable: true })
   email: string;
   @Column()
   password: string;
-  @Column({enum: Role})
-  role: Role;
+  @Column({ enum: RolesEnum })
+  role: RolesEnum;
+  @OneToOne(() => CarrierEntity, (e) => e.id, { nullable: true })
+  carrier: CarrierEntity;
+  @OneToOne(() => ShipperEntity, (e) => e.id, { nullable: true })
+  shipper: ShipperEntity;
 }
