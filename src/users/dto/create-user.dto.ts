@@ -22,7 +22,7 @@ export class CreateUserDto {
     isArray: false,
     example: Role.receiver,
   })
-  role: string;
+  role: Role;
 
   @ApiProperty()
   @IsString()
