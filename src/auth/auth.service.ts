@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -14,7 +14,7 @@ export class AuthService {
 
   async login(login: string, password: string): Promise<any> {
     const loginType: 'email' | 'phone' = this.defineLogin(login);
-    const user: User =
+    const user: UserEntity =
       loginType === 'email'
         ? await this.userService.findOneByEmail(login)
         : await this.userService.findOneByPhone(login);

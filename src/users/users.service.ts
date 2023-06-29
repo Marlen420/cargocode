@@ -1,17 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    const user: User = await this.userRepository.findOne({
+    const user: UserEntity = await this.userRepository.findOne({
       where: { phone: createUserDto.phone },
     });
     if (user) {
@@ -23,19 +23,19 @@ export class UsersService {
     return `User with phone number:${createUserDto.phone} is registered`;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserEntity[]> {
     return await this.userRepository.find();
   }
 
-  async findOneByEmail(email: string): Promise<User> {
+  async findOneByEmail(email: string): Promise<UserEntity> {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async findOneByPhone(phone: string): Promise<User> {
+  async findOneByPhone(phone: string): Promise<UserEntity> {
     return this.userRepository.findOne({ where: { phone } });
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: number): Promise<UserEntity> {
     return await this.userRepository.findOne({ where: { id } });
   }
   async remove(id: number): Promise<DeleteResult> {

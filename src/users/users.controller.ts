@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { DeleteResult } from 'typeorm';
 import {
   ApiTags,
@@ -32,7 +32,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Return all users' })
   @ApiResponse({ status: 404, description: 'No users found' })
   @Get()
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserEntity[]> {
     return await this.usersService.findAll();
   }
 
@@ -41,7 +41,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Return a user by ID' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<User> {
+  async findOne(@Param('id') id: number): Promise<UserEntity> {
     return await this.usersService.findOne(id);
   }
 
