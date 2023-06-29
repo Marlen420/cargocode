@@ -22,18 +22,18 @@ export class UsersService {
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
     const user = await this.createUser(dto);
     return this.shipperRepository.save({
-      id:user.id,
+      id: user.id,
       billing_address: dto.billing_address,
     });
   }
   async createCarrier(dto: CreateCarrierDto): Promise<CarrierEntity> {
     const user = await this.createUser(dto);
-      const carrier = this.carrierRepository.create({
+    const carrier = this.carrierRepository.create({
       id: user.id,
-        physical_address: dto.physical_address,
-        mc_dot_number: dto.mc_dot_number,
-      });
-      return await this.carrierRepository.save(carrier);
+      physical_address: dto.physical_address,
+      mc_dot_number: dto.mc_dot_number,
+    });
+    return await this.carrierRepository.save(carrier);
   }
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const registeredUser = await this.userRepository.findOne({
