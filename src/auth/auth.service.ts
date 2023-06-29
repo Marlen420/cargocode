@@ -4,12 +4,10 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { isError } from 'util';
 
 @Injectable()
 export class AuthService {
   constructor(
-      private readonly userRepo: Repository<User>,
       private readonly userService: UsersService,
       private readonly jwtService: JwtService
   ){}
@@ -24,7 +22,7 @@ export class AuthService {
               return {access_token: this.jwtService.sign(userData)};
           } 
       }
-      throw new BadRequestException('Invalid email or password');
+      throw new BadRequestException('Invalid login or password');
   }
 
   defineLogin(login: string): 'email' | 'phone' {

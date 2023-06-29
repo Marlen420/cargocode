@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Role } from '../enums/roles.enum';
 
 @Entity()
 export abstract class User {
@@ -14,4 +15,6 @@ export abstract class User {
   email: string;
   @Column()
   password: string;
+  @Column({enum: Role})
+  role: Role;
 }
