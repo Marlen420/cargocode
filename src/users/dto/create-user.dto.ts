@@ -5,11 +5,15 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-import { Role } from '../enums/roles.enum';
+import { RolesEnum } from '../enums/roles.enum';
 
 export class CreateUserDto {
+  @ApiProperty()
+  @IsString()
   firstname: string;
 
+  @ApiProperty()
+  @IsString()
   lastname: string;
 
   @ApiProperty({ example: 'jhone@email.com' })
@@ -18,15 +22,15 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({
-    enum: Role,
+    enum: RolesEnum,
     isArray: false,
-    example: Role.receiver,
+    example: RolesEnum.SHIPPER,
   })
-  role: Role;
+  role: RolesEnum;
 
   @ApiProperty()
   @IsString()
-  @IsPhoneNumber('KG' || 'RU')
+  @IsPhoneNumber('KG' || 'US')
   phone: string;
 
   @ApiProperty()

@@ -1,4 +1,4 @@
-import {Column, Entity, OneToOne, PrimaryColumn} from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 @Entity()
 export class ShipperEntity {
