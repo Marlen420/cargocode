@@ -25,7 +25,7 @@ export class CreateCarrierDto {
   @ApiProperty({
     enum: RolesEnum,
     isArray: false,
-    example: RolesEnum.SHIPPER,
+    example: RolesEnum.CARRIER,
   })
   role: RolesEnum;
 

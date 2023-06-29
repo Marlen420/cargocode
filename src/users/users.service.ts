@@ -21,23 +21,29 @@ export class UsersService {
   ) {}
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
     const user = await this.createUser(dto);
-    dto.id = user.id;
-    return this.shipperRepository.save(dto);
+    return this.shipperRepository.save({
+      id:user.id,
+      billing_address: dto.billing_address,
+    });
   }
   async createCarrier(dto: CreateCarrierDto): Promise<CarrierEntity> {
     const user = await this.createUser(dto);
-    dto.id = user.id;
-    return this.carrierRepository.save(dto);
+      const carrier = this.carrierRepository.create({
+      id: user.id,
+        physical_address: dto.physical_address,
+        mc_dot_number: dto.mc_dot_number,
+      });
+      return await this.carrierRepository.save(carrier);
   }
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const registeredUser = await this.userRepository.findOne({
-      where: { phone: dto.phone },
+      where: [{ phone: dto.phone }, { email: dto.email }],
     });
     if (registeredUser) {
       throw new BadRequestException('User has been registered');
     }
     const salt = await bcrypt.genSalt(10);
-    dto.password = bcrypt.hash(dto.password, salt);
+    dto.password = await bcrypt.hash(dto.password, salt);
     return this.userRepository.save(dto);
   }
   async findAll(): Promise<UserEntity[]> {

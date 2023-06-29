@@ -5,8 +5,8 @@ export class CarrierEntity {
   @PrimaryColumn()
   @OneToOne(() => UserEntity, (e) => e.id)
   id: number;
-  @Column({ unique: true })
+  @Column()
   physical_address: string;
-  @Column({ unique: true })
+  @Column()
   mc_dot_number: string;
 }

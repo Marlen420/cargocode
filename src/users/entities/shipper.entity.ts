@@ -5,6 +5,6 @@ export class ShipperEntity {
   @PrimaryColumn()
   @OneToOne(() => UserEntity, (e) => e.id)
   id: number;
-  @Column({ unique: true })
+  @Column()
   billing_address: string;
 }

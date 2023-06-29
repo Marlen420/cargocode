@@ -27,10 +27,10 @@ export class UsersController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @Post('carrier')
-  async createCarrier(
+  createCarrier(
     @Body() createCarrierDto: CreateCarrierDto,
   ): Promise<CarrierEntity> {
-    return await this.usersService.createCarrier(createCarrierDto);
+    return this.usersService.createCarrier(createCarrierDto);
   }
   @ApiOperation({ summary: 'Create a new shipper' })
   @ApiBody({ type: CreateShipperDto })
