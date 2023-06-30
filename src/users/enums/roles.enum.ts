@@ -1,4 +1,4 @@
-export enum Role {
-    receiver = "shipper",
-    carrier = "carrier",
+export enum RolesEnum {
+  SHIPPER = 'SHIPPER',
+  CARRIER = 'CARRIER',
 }
