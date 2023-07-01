@@ -14,4 +14,9 @@ export class MapboxController {
     async getLongitudeLines(@Query('start') startAddress: string, @Query('end') endAddress: string, @Query('unit') unit: DistanceUnit): Promise<any> {
         return this.mapboxService.getDistance(startAddress, endAddress, unit);
     }
+
+    @Get('truck-route')
+    async getTruckRoute(@Query('start') startAddress: string, @Query('end') endAddress: string) {
+        return this.mapboxService.calculateTruckRoute(startAddress, endAddress);
+    }
 }

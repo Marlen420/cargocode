@@ -7,6 +7,7 @@
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -32,8 +33,8 @@
             // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
             style: 'mapbox://styles/examples/cj68bstx01a3r2rndlud0pwpv',
             center: {
-                lng: -74.0064,
-                lat: 40.7081
+                lng: -73.98667,
+                lat: 40.73051,
             },
             zoom: 15,
             pitch: 55,
@@ -42,123 +43,180 @@
         });
 
         map.addControl(new mapboxgl.FullscreenControl());
+        // const bounds = [
+        //     [-123.069003, 45.395273],
+        //     [-122.303707, 45.612333]
+        // ];
+        // map.setMaxBounds(bounds);
+
+        // an arbitrary start will always be the same
+        // only the end or destination will change
+        const start = [-122.662323, 45.523751];
+        const end = [-118.242301, 34.053398];
+
+        let geoList = [
+            [40.73051, -73.98667],
+            [40.73133, -73.98862],
+            [40.71624, -73.99607],
+            [40.69933, -73.98633],
+            [40.70019, -73.98693],
+            [40.70024, -73.98867],
+            [40.70159, -73.98863],
+            [40.70257, -73.99161],
+            [40.70241, -73.9933],
+            [40.70202, -73.99262],
+            [40.7016, -73.99328],
+            [40.66795, -73.99639],
+            [40.64547, -74.01702],
+            [40.61647, -74.0262],
+            [40.62127, -74.169],
+            [40.6421, -74.2068],
+            [40.64065, -74.20871],
+            [40.64371, -74.20387],
+            [40.69853, -74.15621],
+            [40.70373, -74.15248],
+            [40.70922, -74.15009],
+            [40.70896, -74.15731],
+            [40.71273, -74.31902],
+            [40.80754, -74.44529],
+            [40.86392, -74.41682],
+            [40.9031, -74.7215],
+            [40.92749, -75.08431],
+            [40.92755, -75.08699],
+            [40.92485, -75.09095],
+            [40.92245, -75.09051],
+            [40.91917, -75.09535],
+            [40.92038, -75.09473],
+            [40.98522, -75.1449],
+            [40.9912, -75.14323],
+            [40.98477, -75.21735],
+            [41.06985, -75.39024],
+            [41.04765, -76.83018],
+            [40.94446, -77.72676],
+            [41.19051, -79.21524],
+            [41.12867, -80.74707],
+            [41.11094, -80.82828],
+            [41.11281, -80.83694],
+            [41.37899, -81.99004],
+            [41.32309, -82.61693],
+            [41.59053, -83.6412],
+            [41.62941, -84.7567],
+            [41.75605, -86.45795],
+            [41.5917, -87.2284],
+            [41.58871, -87.23297],
+            [41.58725, -87.23319],
+            [41.57824, -87.66998],
+            [41.37864, -88.44576],
+            [41.44033, -90.32135],
+            [41.5942, -90.37638],
+            [41.69396, -91.60233],
+            [41.59752, -93.77721],
+            [41.59219, -93.80122],
+            [41.49882, -95.58],
+            [41.23187, -95.83433],
+            [40.81628, -96.76072],
+            [40.82356, -98.40494],
+            [40.66999, -99.01908],
+            [40.70777, -99.66364],
+            [41.13459, -100.94561],
+            [41.03611, -102.13637],
+            [40.75318, -102.97936],
+            [40.2758, -103.5719],
+            [40.16496, -104.44458],
+            [39.85113, -104.91952],
+            [39.7774, -105.1425],
+            [39.76066, -105.65149],
+            [39.50176, -106.16422],
+            [39.71205, -106.70001],
+            [39.5203, -107.84792],
+            [39.11828, -108.32859],
+            [39.23293, -108.91004],
+            [38.93349, -109.42432],
+            [38.99168, -110.18403],
+            [38.75547, -111.39082],
+            [38.93357, -111.8588],
+            [38.57984, -112.28138],
+            [38.5797, -112.59912],
+            [38.14399, -112.61587],
+            [37.03228, -113.60244],
+            [36.46931, -114.8256],
+            [36.17024, -115.15849],
+            [35.52962, -115.42476],
+            [35.5178, -115.43065],
+            [35.51742, -115.43074],
+            [34.88302, -117.06261],
+            [34.23634, -117.42513],
+            [34.14213, -117.48931],
+            [34.13251, -117.95068],
+            [34.07253, -117.99967],
+            [34.06972, -118.00072],
+            [34.05382, -118.23368],
+            [34.05527, -118.23917],
+            [34.05152, -118.24241],
+            [34.05222, -118.2434],
+            [34.0534, -118.2423]
+        ];
+        geoList = geoList.map((item) => [item[1], item[0]]);
+
+        let clearances = {
+            type: 'FeatureCollection'
+        }
+        clearances.features = geoList.map((item) => ({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: item
+            },
+            properties: {
+                clearance: "13' 2"
+            }
+        }));
+
+        // const obstacle = turf.buffer(clearances, 0.25, {
+        //     unit: 'miles'
+        // });
 
         map.on('load', () => {
-            const bins = 16;
-            const maxHeight = 200;
-            const binWidth = maxHeight / bins;
+            // map.addLayer({
+            //     id: 'clearances',
+            //     type: 'fill',
+            //     source: {
+            //         type: 'geojson',
+            //         data: obstacle
+            //     },
+            //     layout: {},
+            //     paint: {
+            //         'fill-color': '#f03b20',
+            //         'fill-opacity': 0.5,
+            //         'fill-outline-color': '#f03b20'
+            //     }
+            // });
 
-            // Divide the buildings into 16 bins based on their true height, using a layer filter.
-            for (let i = 0; i < bins; i++) {
-                map.addLayer({
-                    'id': `3d-buildings-${i}`,
-                    'source': 'composite',
-                    'source-layer': 'building',
-                    'filter': [
-                        'all', ['==', 'extrude', 'true'],
-                        ['>', 'height', i * binWidth],
-                        ['<=', 'height', (i + 1) * binWidth]
-                    ],
-                    'type': 'fill-extrusion',
-                    'minzoom': 15,
-                    'paint': {
-                        'fill-extrusion-color': '#aaa',
-                        'fill-extrusion-height-transition': {
-                            duration: 0,
-                            delay: 0
-                        },
-                        'fill-extrusion-opacity': 0.6
+            map.addSource('route', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: geoList
                     }
-                });
-            }
+                }
+            });
 
-            // Older browsers might not implement mediaDevices at all, so we set an empty object first
-            if (navigator.mediaDevices === undefined) {
-                navigator.mediaDevices = {};
-            }
-
-            // Some browsers partially implement mediaDevices. We can't just assign an object
-            // with getUserMedia as it would overwrite existing properties.
-            // Here, we will just add the getUserMedia property if it's missing.
-            if (navigator.mediaDevices.getUserMedia === undefined) {
-                navigator.mediaDevices.getUserMedia = (constraints) => {
-                    // First get ahold of the legacy getUserMedia, if present
-                    const getUserMedia =
-                        navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-                    // Some browsers just don't implement it - return a rejected promise with an error
-                    // to keep a consistent interface
-                    if (!getUserMedia) {
-                        return Promise.reject(
-                            new Error(
-                                'getUserMedia is not implemented in this browser'
-                            )
-                        );
-                    }
-
-                    // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-                    return new Promise((resolve, reject) => {
-                        getUserMedia.call(navigator, constraints, resolve, reject);
-                    });
-                };
-            }
-
-            navigator.mediaDevices
-                .getUserMedia({
-                    audio: true
-                })
-                .then((stream) => {
-                    // Set up a Web Audio AudioContext and AnalyzerNode, configured to return the
-                    // same number of bins of audio frequency data.
-                    const audioCtx = new(window.AudioContext ||
-                        window.webkitAudioContext)();
-
-                    const analyser = audioCtx.createAnalyser();
-                    analyser.minDecibels = -90;
-                    analyser.maxDecibels = -10;
-                    analyser.smoothingTimeConstant = 0.85;
-
-                    const source = audioCtx.createMediaStreamSource(stream);
-                    source.connect(analyser);
-
-                    analyser.fftSize = bins * 2;
-
-                    const dataArray = new Uint8Array(bins);
-
-                    function draw(now) {
-                        analyser.getByteFrequencyData(dataArray);
-
-                        // Use that data to drive updates to the fill-extrusion-height property.
-                        let avg = 0;
-                        for (let i = 0; i < bins; i++) {
-                            avg += dataArray[i];
-                            map.setPaintProperty(
-                                `3d-buildings-${i}`,
-                                'fill-extrusion-height',
-                                10 + 4 * i + dataArray[i]
-                            );
-                        }
-                        avg /= bins;
-
-                        // Animate the map bearing and light color over time, and make the light more
-                        // intense when the audio is louder.
-                        map.setBearing(now / 500);
-                        const hue = (now / 100) % 360;
-                        const saturation = Math.min(50 + avg / 4, 100);
-                        map.setLight({
-                            color: `hsl(${hue},${saturation}%,50%)`,
-                            intensity: Math.min(1, (avg / 256) * 10)
-                        });
-
-                        requestAnimationFrame(draw);
-                    }
-
-                    requestAnimationFrame(draw);
-                })
-                .catch((err) => {
-                    console.log('The following gUM error occurred:', err);
-                });
-        });
+            map.addLayer({
+                id: 'route',
+                type: 'line',
+                source: 'route',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': '#FF0000',
+                    'line-width': 4
+                }
+            });
+        })
     </script>
 
 </body>
