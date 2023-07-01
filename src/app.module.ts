@@ -3,7 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
 import { AuthModule } from './auth/auth.module';
 import { MapboxModule } from './mapbox/mapbox.module';
+import { OrdersModule } from './orders/orders.module';
+import { RedisService } from './redis/redis.service';
 import { UsersModule } from './users/users.module';
+
 config();
 @Module({
   imports: [
@@ -20,9 +23,10 @@ config();
     }),
     UsersModule,
     AuthModule,
-    MapboxModule
+    MapboxModule,
+    OrdersModule
   ],
   controllers: [],
-  providers: [],
+  providers: [RedisService],
 })
 export class AppModule {}

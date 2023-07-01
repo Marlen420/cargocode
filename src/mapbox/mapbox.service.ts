@@ -25,8 +25,6 @@ export class MapboxService {
     private readonly directionsClient: any;
     constructor() {
         this.directionsClient = directionsService({ accessToken: this.accessToken });
-        const geo = "udrwFtoqbMcDdKh}Apm@thB{{@kDvBIzImGGcErQ^pIlAgCrAbChqElRnkC|_CftDjx@_]n{ZeaCfkF`H|JcRg]suI{hHo_@iVia@}Mr@bl@qVtq^qoQdtWk_J}pD{sFfoz@mwCpzeAKvOzOvW~MwAnSf]qF{BgtKpxHkd@mIdg@fnMwrOpw`@viCrfxG|cSrbnDy`o@~uaHnaK|djHxmBpzNuJbu@s~r@ze`Fj|I`myBofs@t`gE_rFzzxEovWxgkIdb_@hnuCtQp[bHj@hw@|htAn~e@rovCq`KlimJu`]|vIonRdmnFvyQ~wgLh`@`uCpfQjlzIlcs@ptp@ldpA||sDol@jc`Ix~\\j}vBckFn{|BsjrAhkyFnfRfqgFhgv@tscDrf|AjvrBvsTfmiDlh|@jw{AxkMrpj@rgBdlbBbqq@pccBiah@tsgBlmd@le_FromAd{|AqkU`qpBnny@fmcBujJdksChcm@lujFcxa@zkzAxadAbpqAZz`}@dbtAtgBdcxE`u_Ep}lBv{mFdly@p_`Azb|Bd_s@zhAxc@jAP~{zBdv}Hvh}BvxeAxkQbpKb{@pbyAzuJdqHpPpEjbB~nl@aHha@lVfSkCdEkF{E";
-        console.log(polyline.decode(geo));
         // this.getDistance('1600 Amphitheatre Parkway, Mountain View, CA', 'New work, central park', DistanceUnit.km);
     }
 
