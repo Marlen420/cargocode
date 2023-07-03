@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadGatewayException, BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { RedisService } from "src/redis/redis.service";
 import { PriceEstimateDto } from "./dto/priceEstimate.dto";
 import { MapboxService } from "src/mapbox/mapbox.service";
@@ -97,7 +97,7 @@ export class OrdersService {
 			if (!order) {
 				throw new BadRequestException('Order doesn\'t exist');
 			}
-			const carrier: CarrierEntity = await this.usersService.findOneCarrier(token.id);
+			const carrier: CarrierEntity = await this.usersService.findOneCarrier(token.id, {user: false});
 			if (!carrier) {
 				throw new BadRequestException('Couldn\'t accept the order');
 			}
@@ -188,6 +188,9 @@ export class OrdersService {
 					throw new BadRequestException('Order doesn\'t exist');
 				}
 			}
+			if (order.status !== OrderStatus.waiting) {
+				throw new BadGatewayException('Cannot disable order, it\'s already accepted');
+			}
 			order.active = false;
 			return this.orderRepo.save(order)
 				.then(async (savedOrder) => {
@@ -212,6 +215,9 @@ export class OrdersService {
 				if (!order) {
 					throw new BadRequestException('Order doesn\'t exist');
 				}
+			}
+			if (order.status !== OrderStatus.waiting) {
+				throw new BadGatewayException('Cannot enable order, it\'s already accepted');
 			}
 			order.active = true;
 			return this.orderRepo.save(order)
