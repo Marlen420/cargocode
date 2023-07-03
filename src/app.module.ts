@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
 import { AuthModule } from './auth/auth.module';
 import { MapboxModule } from './mapbox/mapbox.module';
+import { OrdersModule } from './orders/orders.module';
+import { RedisModule } from './redis/redis.module';
+import { RedisService } from './redis/redis.service';
 import { UsersModule } from './users/users.module';
+
 config();
 @Module({
   imports: [
@@ -18,11 +23,18 @@ config();
       autoLoadEntities: true,
       synchronize: true,
     }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1d' },
+    }),
+    RedisModule,
     UsersModule,
     AuthModule,
-    MapboxModule
+    MapboxModule,
+    OrdersModule
   ],
   controllers: [],
-  providers: [],
+  providers: [RedisService],
 })
 export class AppModule {}

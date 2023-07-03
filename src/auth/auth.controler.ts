@@ -6,8 +6,9 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -15,10 +16,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  login(
-    @Body('login') login: string,
-    @Body('password') password: string,
-  ): Promise<any> {
-    return this.authService.login(login, password);
+  @ApiBody({type: LoginDto})
+  login(@Body() data: LoginDto): Promise<any> {
+    return this.authService.login(data);
   }
 }

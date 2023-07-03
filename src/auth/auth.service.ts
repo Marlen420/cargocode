@@ -3,6 +3,10 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login.dto';
+import { config } from 'dotenv';
+
+config();
 
 @Injectable()
 export class AuthService {
@@ -11,7 +15,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(login: string, password: string): Promise<any> {
+  async login(data: LoginDto): Promise<any> {
+    const { login, password } = data;
     const loginType: 'email' | 'phone' = this.defineLogin(login);
     const user: UserEntity =
       loginType === 'email'
@@ -21,7 +26,7 @@ export class AuthService {
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
         delete user.password;
-        return { access_token: this.jwtService.sign(user) };
+        return { access_token: this.jwtService.sign({...user})};
       }
     }
     throw new BadRequestException('Invalid login or password');
