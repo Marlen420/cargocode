@@ -10,8 +10,8 @@ export class MapboxController {
         private readonly mapboxService: MapboxService
     ) {}
 
-    @Get('longitude-lines')
-    async getLongitudeLines(@Query('start') startAddress: string, @Query('end') endAddress: string, @Query('unit') unit: DistanceUnit): Promise<any> {
+    @Get('distance')
+    async getDistance(@Query('start') startAddress: string, @Query('end') endAddress: string, @Query('unit') unit: DistanceUnit): Promise<any> {
         return this.mapboxService.getDistance(startAddress, endAddress, unit);
     }
 

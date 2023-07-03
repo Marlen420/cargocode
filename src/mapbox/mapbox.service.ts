@@ -4,9 +4,10 @@ import axios from 'axios';
 import { DistanceUnit } from "./enums/distanceUnit.enum";
 import { METER_CONVERT_VALUES } from "src/constants/meterConvertValues";
 import CONFIG from "src/config";
+import { RedisService } from "src/redis/redis.service";
 
 const directionsService = require('@mapbox/mapbox-sdk/services/directions');
-const polyline = require('@mapbox/polyline');
+// const polyline = require('@mapbox/polyline');
 
 config();
 
@@ -23,9 +24,15 @@ export class MapboxService {
     private readonly calculateDistanceUrl: string = CONFIG.mapboxDistanceCalculationurl;
     private readonly truckProfile: string = 'driving';
     private readonly directionsClient: any;
-    constructor() {
+    
+    /**
+     * Constructs mapbox service
+     * @param {Redis} redisService service responsible for redis methods
+     */
+    constructor(
+        private readonly redisService: RedisService
+    ) {
         this.directionsClient = directionsService({ accessToken: this.accessToken });
-        // this.getDistance('1600 Amphitheatre Parkway, Mountain View, CA', 'New work, central park', DistanceUnit.km);
     }
 
     /**
@@ -53,15 +60,20 @@ export class MapboxService {
      * @param {DistanceUnit} unit unit to convert answer
      */
     async getDistance(startAddress: string, endAddress: string, unit: DistanceUnit): Promise<any> {
+        const DISTANCE_IN_METER_KEY = `mapbox:getDistance:from=${startAddress};to=${endAddress}`;
+        let distanceInMeter = await this.redisService.get(DISTANCE_IN_METER_KEY);
+        if (distanceInMeter) {
+            return Math.ceil(distanceInMeter/METER_CONVERT_VALUES[unit]);;
+        }
         try {
             const startResponse = await this.getGeocodeAddress(startAddress, 'string');
             const endResponse = await this.getGeocodeAddress(endAddress, 'string');
 
             const response = await axios.get(`${this.calculateDistanceUrl}${startResponse};${endResponse}?access_token=${this.accessToken}`);
             
-            const distanceInMeter = response.data.routes[0].distance;
+            distanceInMeter = response.data.routes[0].distance;
+            await this.redisService.set(DISTANCE_IN_METER_KEY, distanceInMeter);
             const distanceInUnit = Math.ceil(distanceInMeter/METER_CONVERT_VALUES[unit]);
-            console.log(distanceInUnit + ` ${unit}`);
             return distanceInUnit;
         } catch (error) {
             throw new Error('Error getting distance');

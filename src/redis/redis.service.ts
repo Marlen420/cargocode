@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { config } from "dotenv";
 import Redis from 'ioredis';
 
@@ -10,10 +10,14 @@ config();
  */
 @Injectable()
 export class RedisService {
-    private readonly client: Redis;
-    constructor() {
-        this.client = new Redis(process.env.REDIS_HOST);
-    }
+    
+    /**
+     * Constructs redis service class
+     * @param {Redis} client redis client
+     */
+    constructor(
+        @Inject('REDIS_CLIENT') private readonly client: Redis
+    ) {}
 
     /**
      * Returns value of provided key in redis hash table
@@ -21,7 +25,7 @@ export class RedisService {
      * @returns {Promise<any>} a value of key in redis hash table
      */
     async get(key: string): Promise<any> {
-        return this.client.get(key);
+        return JSON.parse(await this.client.get(key));
     }
 
     /**

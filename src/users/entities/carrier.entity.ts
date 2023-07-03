@@ -1,4 +1,5 @@
-import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { OrderEntity } from 'src/orders/entities/order.entity';
+import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 @Entity()
 export class CarrierEntity {
@@ -9,4 +10,6 @@ export class CarrierEntity {
   physical_address: string;
   @Column()
   mc_dot_number: string;
+  @OneToMany(() => OrderEntity, (e) => e.carrier)
+  orders: OrderEntity[];
 }

@@ -24,6 +24,4 @@ export class UserEntity {
   carrier: CarrierEntity;
   @OneToOne(() => ShipperEntity, (e) => e.id, { nullable: true })
   shipper: ShipperEntity;
-  @OneToMany(() => OrderEntity, (e) => e.user)
-  orders: OrderEntity[];
 }
