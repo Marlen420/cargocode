@@ -10,6 +10,6 @@ config();
   imports: [RedisModule],
   controllers: [MapboxController],
   providers: [MapboxService, RedisService],
-  exports: [MapboxService]
+  exports: [MapboxService],
 })
 export class MapboxModule {}

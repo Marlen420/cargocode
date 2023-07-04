@@ -20,9 +20,15 @@ config();
 @Module({
   imports: [
     UsersModule,
-    TypeOrmModule.forFeature([UserEntity, ShipperEntity, CarrierEntity, OperatorEntity, CompanyEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      ShipperEntity,
+      CarrierEntity,
+      OperatorEntity,
+      CompanyEntity,
+    ]),
     RedisModule,
-    CompaniesModule
+    CompaniesModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UsersService, RedisService, CompaniesService],

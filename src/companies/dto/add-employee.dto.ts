@@ -1,26 +1,26 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class AddEmployeeDto {
-    @ApiProperty()
-    @IsString()
-    role: 'CARRIER' | 'OPERATOR'
-    
-    @ApiProperty()
-    @IsString()
-    firstname: string;
+  @ApiProperty()
+  @IsString()
+  role: 'CARRIER' | 'OPERATOR';
 
-    @ApiProperty()
-    @IsString()
-    lastname: string;
+  @ApiProperty()
+  @IsString()
+  firstname: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsEmail()
-    email: string | null;
+  @ApiProperty()
+  @IsString()
+  lastname: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    phone: string | null;
+  @ApiProperty()
+  @IsOptional()
+  @IsEmail()
+  email: string | null;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  phone: string | null;
 }
