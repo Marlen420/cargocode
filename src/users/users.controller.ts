@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities/user.entity';
 import { DeleteResult } from 'typeorm';
@@ -13,11 +13,30 @@ import { CreateShipperDto } from './dto/create-shipper.dto';
 import { ShipperEntity } from './entities/shipper.entity';
 import { CarrierEntity } from './entities/carrier.entity';
 import { CreateCarrierDto } from './dto/create-carrier.dto';
+import { CreateOperatorDto } from './dto/create-operator.dto';
+import { OperatorEntity } from './entities/operator.entity';
+import { RolesEnum } from './enums/roles.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @ApiOperation({ summary: 'Create a new operator' })
+  @ApiBody({ type: CreateCarrierDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Operator has been successfully created',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @Post('operator')
+  async createOperator(
+    @Body() createOperatorDto: CreateOperatorDto,
+  ): Promise<OperatorEntity> {
+    return this.usersService.createOperator(createOperatorDto);
+  }
 
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({ type: CreateCarrierDto })
@@ -32,6 +51,7 @@ export class UsersController {
   ): Promise<CarrierEntity> {
     return this.usersService.createCarrier(createCarrierDto);
   }
+
   @ApiOperation({ summary: 'Create a new shipper' })
   @ApiBody({ type: CreateShipperDto })
   @ApiResponse({
@@ -46,6 +66,8 @@ export class UsersController {
     return this.usersService.createShipper(createShipperDto);
   }
 
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users' })
   @ApiResponse({ status: 404, description: 'No users found' })
@@ -54,6 +76,8 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
+  @Roles(RolesEnum.SHIPPER, RolesEnum.CARRIER, RolesEnum.OPERATOR)
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'Return a user by ID' })

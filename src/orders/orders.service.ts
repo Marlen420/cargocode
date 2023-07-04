@@ -262,10 +262,10 @@ export class OrdersService {
 				if (!carrier) {
 					throw new BadRequestException('Carrier doesn\'t exist');
 				}
-				return this.orderRepo.find({where: {carrier}});
+				return this.orderRepo.find({where: {carrier: {id: carrier.id}}});
 			}
 			const shipper = await this.usersService.findOneShipper(token.id, {user: false});
-			return this.orderRepo.find({where: {shipper}});
+			return this.orderRepo.find({where: {shipper: {id: shipper.id}}});
 		}
 
 		private getDecodedToken(req: Request): UserToken {
