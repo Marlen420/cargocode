@@ -32,20 +32,18 @@ export class AuthService {
         return { access_token: this.jwtService.sign({...user})};
       }
     }
-    throw new BadRequestException('Invalid login or password');
-  }
-
-  async loginCompany(data: LoginDto): Promise<any> {
-    const { login, password } = data;
-    const isEmail: boolean = this.isEmail(login);
-    const company: CompanyEntity = isEmail ? await this.companiesService.findByEmail(login) : await this.companiesService.findByLogin(login);
-    if (company) {
-      const passwordValid: boolean = await bcrypt.compare(password, company.password);
-      if (passwordValid) {
-        delete company.password;
-        return { access_token: this.jwtService.sign(company)}
+    const company: CompanyEntity = 
+      isEmail
+        ? await this.companiesService.findByEmail(login)
+        : await this.companiesService.findByLogin(login)
+      if (company) {
+        const passwordValid = await bcrypt.compare(password, company.password);
+        if (passwordValid) {
+          delete company.password;
+          return { access_token: this.jwtService.sign({...company})};
+        }
       }
-    }
+    throw new BadRequestException('Invalid login or password');
   }
 
   isEmail(login: string): boolean {
