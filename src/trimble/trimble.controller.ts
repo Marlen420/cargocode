@@ -11,8 +11,8 @@ export class TrimbleController {
 
     @ApiQuery({name: 'start'})
     @ApiQuery({name: 'end'})
-    @Get('truck-route')
+    @Get('location')
     async getTruckRoute(@Query('start') startAddress: string, @Query('end') endAddress: string) {
-        return this.trimbleService.getTruckRoute(startAddress, endAddress);
+        return this.trimbleService.getLocation(startAddress, endAddress);
     }
 }
