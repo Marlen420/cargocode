@@ -1,4 +1,8 @@
-import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
@@ -27,50 +31,74 @@ export class UsersService {
     @InjectRepository(OperatorEntity)
     private readonly operatorRepository: Repository<OperatorEntity>,
     private readonly redisService: RedisService,
-    private readonly companiesService: CompaniesService
+    private readonly companiesService: CompaniesService,
   ) {}
 
   async createOperator(dto: CreateOperatorDto): Promise<OperatorEntity> {
-    const company: CompanyEntity = await this.companiesService.findById(dto.company_id);
+    const company: CompanyEntity = await this.companiesService.findById(
+      dto.company_id,
+    );
     if (!company) {
       throw new BadRequestException('Company not found');
     }
-    if (!company.employees_credential.some((item: AddEmployeeDto) => item.email === dto.email || item.phone === dto.phone)) {
+    if (
+      !company.employees_credential.some(
+        (item: AddEmployeeDto) =>
+          item.email === dto.email || item.phone === dto.phone,
+      )
+    ) {
       throw new BadRequestException('Employee not registered in company');
     }
     const user = await this.createUser(dto);
-    return await this.operatorRepository.save({
-      id: user.id
-    }).then(async (savedEmployee) => {
-      const user = await this.findOne(savedEmployee.id);
-      delete user.password;
-      return {...savedEmployee, ...user};
-    }).then(async (savedEmployee) => {
-      await this.redisService.set(`users:usersService:employee:${savedEmployee.id}`, savedEmployee);
-      return savedEmployee;
-    })
+    return await this.operatorRepository
+      .save({
+        id: user.id,
+      })
+      .then(async (savedEmployee) => {
+        const user = await this.findOne(savedEmployee.id);
+        delete user.password;
+        return { ...savedEmployee, ...user };
+      })
+      .then(async (savedEmployee) => {
+        await this.redisService.set(
+          `users:usersService:employee:${savedEmployee.id}`,
+          savedEmployee,
+        );
+        return savedEmployee;
+      });
   }
 
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
     const user = await this.createUser(dto);
-    return await this.shipperRepository.save({
-      id: user.id,
-      billing_address: dto.billing_address,
-    }).then(async (savedShipper) => {
-      const user = await this.findOne(savedShipper.id);
-      delete user.password;
-      return {...savedShipper, ...user};
-    }).then(async (savedShipper) => {
-      await this.redisService.set(`users:usersService:shipper:${savedShipper.id}`, savedShipper);
-      return savedShipper;
-    })
+    return await this.shipperRepository
+      .save({
+        id: user.id,
+        billing_address: dto.billing_address,
+      })
+      .then(async (savedShipper) => {
+        const user = await this.findOne(savedShipper.id);
+        delete user.password;
+        return { ...savedShipper, ...user };
+      })
+      .then(async (savedShipper) => {
+        await this.redisService.set(
+          `users:usersService:shipper:${savedShipper.id}`,
+          savedShipper,
+        );
+        return savedShipper;
+      });
   }
 
   async createCarrier(dto: CreateCarrierDto): Promise<CarrierEntity> {
     let company: CompanyEntity = null;
     if (dto.company_id !== -1) {
       company = await this.companiesService.findById(dto.company_id);
-      if (!company.employees_credential.some((item: AddEmployeeDto) => item.email === dto.email || item.phone === dto.phone)) {
+      if (
+        !company.employees_credential.some(
+          (item: AddEmployeeDto) =>
+            item.email === dto.email || item.phone === dto.phone,
+        )
+      ) {
         throw new BadGatewayException('Carrier is not registered in company');
       }
     }
@@ -79,18 +107,22 @@ export class UsersService {
       id: user.id,
       physical_address: dto.physical_address,
       mc_dot_number: dto.mc_dot_number,
-      company
+      company,
     });
-    return await this.carrierRepository.save(carrier)
+    return await this.carrierRepository
+      .save(carrier)
       .then(async (savedCarrier) => {
         const user = await this.findOne(savedCarrier.id);
         delete user.password;
-        return {...savedCarrier, ...user};
+        return { ...savedCarrier, ...user };
       })
       .then(async (savedCarrier) => {
-      await this.redisService.set(`users:usersService:carrier:${savedCarrier.id}`, savedCarrier);
-      return savedCarrier;
-    });
+        await this.redisService.set(
+          `users:usersService:carrier:${savedCarrier.id}`,
+          savedCarrier,
+        );
+        return savedCarrier;
+      });
   }
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const registeredUser = await this.userRepository.findOne({
@@ -101,11 +133,13 @@ export class UsersService {
     }
     const salt = await bcrypt.genSalt(10);
     dto.password = await bcrypt.hash(dto.password, salt);
-    return await this.userRepository.save(dto)
-      .then(async (savedUser) => {
-        await this.redisService.set(`users:userService:user:${savedUser.id}`, savedUser);
-        return savedUser;
-      })
+    return await this.userRepository.save(dto).then(async (savedUser) => {
+      await this.redisService.set(
+        `users:userService:user:${savedUser.id}`,
+        savedUser,
+      );
+      return savedUser;
+    });
   }
   async findAll(): Promise<UserEntity[]> {
     return await this.userRepository.find();
@@ -127,31 +161,49 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { id } });
   }
 
-  async findOneShipper(id: number, options = {user: true}): Promise<ShipperEntity> {
-    const shipper = await this.redisService.get(`users:userService:shipper:${id}`);
+  async findOneShipper(
+    id: number,
+    options = { user: true },
+  ): Promise<ShipperEntity> {
+    const shipper = await this.redisService.get(
+      `users:userService:shipper:${id}`,
+    );
     const user = await this.findOne(id);
     delete user.password;
     if (shipper) {
-      return options.user ? {...shipper, ...user} : shipper;
+      return options.user ? { ...shipper, ...user } : shipper;
     }
-    return await this.shipperRepository.findOne({ where: { id } })
+    return await this.shipperRepository
+      .findOne({ where: { id } })
       .then(async (savedShipper) => {
-        await this.redisService.set(`users:userService:shipper:${id}`, savedShipper);
-        return options.user  ? {...user, ...savedShipper} : savedShipper;
+        await this.redisService.set(
+          `users:userService:shipper:${id}`,
+          savedShipper,
+        );
+        return options.user ? { ...user, ...savedShipper } : savedShipper;
       });
   }
 
-  async findOneCarrier(id: number, options = {user: true}): Promise<CarrierEntity> {
-    const carrier = await this.redisService.get(`users:userService:carrier:${id}`);
+  async findOneCarrier(
+    id: number,
+    options = { user: true },
+  ): Promise<CarrierEntity> {
+    const carrier = await this.redisService.get(
+      `users:userService:carrier:${id}`,
+    );
     const user = await this.findOne(id);
     delete user.password;
     if (carrier) {
-      return options.user ? {...user, ...carrier} : carrier;
+      return options.user ? { ...user, ...carrier } : carrier;
     }
-    return await this.carrierRepository.findOne({ where: { id } })
+    return await this.carrierRepository
+      .findOne({ where: { id } })
       .then(async (savedCarrier) => {
-        await this.redisService.set(`users:userService:carrier:${id}`, savedCarrier);
-        return options.user ? {...user, ...savedCarrier} : savedCarrier;
+        await this.redisService.set(
+          `users:userService:carrier:${id}`,
+          savedCarrier,
+        );
+        return options.user ? { ...user, ...savedCarrier } : savedCarrier;
       });
   }
 

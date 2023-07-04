@@ -16,8 +16,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  @ApiBody({type: LoginDto})
-  login(@Body() data: LoginDto): Promise<{access_token: string}> {
+  @ApiBody({ type: LoginDto })
+  login(@Body() data: LoginDto): Promise<{ access_token: string }> {
     return this.authService.loginUser(data);
   }
 }

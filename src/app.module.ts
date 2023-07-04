@@ -38,7 +38,7 @@ config();
     AuthModule,
     MapboxModule,
     OrdersModule,
-    TrimbleModule
+    TrimbleModule,
   ],
   controllers: [],
   providers: [

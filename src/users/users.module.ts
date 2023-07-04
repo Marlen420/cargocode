@@ -14,9 +14,15 @@ import { OperatorEntity } from './entities/operator.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, ShipperEntity, CarrierEntity, OperatorEntity, CompanyEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      ShipperEntity,
+      CarrierEntity,
+      OperatorEntity,
+      CompanyEntity,
+    ]),
     RedisModule,
-    CompaniesModule
+    CompaniesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, RedisService, CompaniesService],

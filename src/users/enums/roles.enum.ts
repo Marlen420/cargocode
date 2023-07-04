@@ -3,5 +3,5 @@ export enum RolesEnum {
   CARRIER = 'CARRIER',
   OPERATOR = 'OPERATOR',
   COMPANY = 'COMPANY',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
 }
