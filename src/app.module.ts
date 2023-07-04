@@ -12,6 +12,8 @@ import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
 import { TrimbleModule } from './trimble/trimble.module';
 import { UsersModule } from './users/users.module';
+import { StripeController } from './stripe/stripe.controller';
+import { StripeModule } from './stripe/stripe.module';
 
 config();
 @Module({
@@ -39,8 +41,9 @@ config();
     MapboxModule,
     OrdersModule,
     TrimbleModule,
+    StripeModule,
   ],
-  controllers: [],
+  controllers: [StripeController],
   providers: [
     RedisService,
     {

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { MapboxModule } from 'src/mapbox/mapbox.module';

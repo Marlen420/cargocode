@@ -1,12 +1,6 @@
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { RolesEnum } from 'src/users/enums/roles.enum';
-import {
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AddEmployeeDto } from '../dto/add-employee.dto';
 
 @Entity()
