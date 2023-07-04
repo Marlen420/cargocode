@@ -1,4 +1,7 @@
 export enum RolesEnum {
   SHIPPER = 'SHIPPER',
   CARRIER = 'CARRIER',
+  OPERATOR = 'OPERATOR',
+  COMPANY = 'COMPANY',
+  ADMIN = 'ADMIN'
 }

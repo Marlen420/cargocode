@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { RolesEnum } from '../enums/roles.enum';
 
-export class CreateCarrierDto {
+export class CreateOperatorDto {
   id: number;
   @ApiProperty()
   @IsString()
@@ -39,14 +39,6 @@ export class CreateCarrierDto {
   @IsString()
   @IsStrongPassword()
   password: string;
-
-  @ApiProperty()
-  @IsString()
-  physical_address: string;
-
-  @ApiProperty()
-  @IsString()
-  mc_dot_number: string;
 
   @ApiProperty()
   @IsNumber()

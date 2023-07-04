@@ -15,9 +15,15 @@ import { LoginDto } from './dto/login.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('login')
+  @Post('login-user')
   @ApiBody({type: LoginDto})
-  login(@Body() data: LoginDto): Promise<any> {
-    return this.authService.login(data);
+  login(@Body() data: LoginDto): Promise<{access_token: string}> {
+    return this.authService.loginUser(data);
+  }
+
+  @Post('login-company')
+  @ApiBody({type: LoginDto})
+  loginCompany(@Body() data: LoginDto): Promise<{access_token: string}> {
+    return this.loginCompany(data);
   }
 }

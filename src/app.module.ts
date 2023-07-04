@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
 import { AuthModule } from './auth/auth.module';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { CompaniesModule } from './companies/companies.module';
 import { MapboxModule } from './mapbox/mapbox.module';
 import { OrdersModule } from './orders/orders.module';
 import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
+import { TrimbleModule } from './trimble/trimble.module';
 import { UsersModule } from './users/users.module';
 
 config();
@@ -30,11 +34,19 @@ config();
     }),
     RedisModule,
     UsersModule,
+    CompaniesModule,
     AuthModule,
     MapboxModule,
-    OrdersModule
+    OrdersModule,
+    TrimbleModule
   ],
   controllers: [],
-  providers: [RedisService],
+  providers: [
+    RedisService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

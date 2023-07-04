@@ -1,21 +1,38 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import { RolesEnum } from 'src/users/enums/roles.enum';
 import { ROLES_KEY } from '../decorators/role.decorator';
 
+interface UserToken {
+  role: RolesEnum,
+  [key: string]: any
+}
+
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private readonly jwtService: JwtService
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<RolesEnum[]>(
+    const requiredRoles = this.reflector.getAllAndOverride<(RolesEnum | 'ALL')[]>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
     if (!requiredRoles) {
       return true;
     }
-    const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    try {
+      const { headers }: Request = context.switchToHttp().getRequest();
+      let token: string = headers.authorization.split(' ')[1];
+      const decodedToken = this.jwtService.verify(token) as UserToken;
+      return requiredRoles.some((role) => role === 'ALL' || role === decodedToken.role);
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
+    
   }
 }

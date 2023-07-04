@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
@@ -9,6 +9,11 @@ import { CreateShipperDto } from './dto/create-shipper.dto';
 import { CreateCarrierDto } from './dto/create-carrier.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RedisService } from 'src/redis/redis.service';
+import { CompaniesService } from 'src/companies/companies.service';
+import { CompanyEntity } from 'src/companies/entities/company.entity';
+import { AddEmployeeDto } from 'src/companies/dto/add-employee.dto';
+import { CreateOperatorDto } from './dto/create-operator.dto';
+import { OperatorEntity } from './entities/operator.entity';
 
 @Injectable()
 export class UsersService {
@@ -19,8 +24,33 @@ export class UsersService {
     private readonly shipperRepository: Repository<ShipperEntity>,
     @InjectRepository(CarrierEntity)
     private readonly carrierRepository: Repository<CarrierEntity>,
-    private readonly redisService: RedisService
+    @InjectRepository(OperatorEntity)
+    private readonly operatorRepository: Repository<OperatorEntity>,
+    private readonly redisService: RedisService,
+    private readonly companiesService: CompaniesService
   ) {}
+
+  async createOperator(dto: CreateOperatorDto): Promise<OperatorEntity> {
+    const company: CompanyEntity = await this.companiesService.findById(dto.company_id);
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
+    if (!company.employees_credential.some((item: AddEmployeeDto) => item.email === dto.email || item.phone === dto.phone)) {
+      throw new BadRequestException('Employee not registered in company');
+    }
+    const user = await this.createUser(dto);
+    return await this.operatorRepository.save({
+      id: user.id
+    }).then(async (savedEmployee) => {
+      const user = await this.findOne(savedEmployee.id);
+      delete user.password;
+      return {...savedEmployee, ...user};
+    }).then(async (savedEmployee) => {
+      await this.redisService.set(`users:usersService:employee:${savedEmployee.id}`, savedEmployee);
+      return savedEmployee;
+    })
+  }
+
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
     const user = await this.createUser(dto);
     return await this.shipperRepository.save({
@@ -35,12 +65,21 @@ export class UsersService {
       return savedShipper;
     })
   }
+
   async createCarrier(dto: CreateCarrierDto): Promise<CarrierEntity> {
+    let company: CompanyEntity = null;
+    if (dto.company_id !== -1) {
+      company = await this.companiesService.findById(dto.company_id);
+      if (!company.employees_credential.some((item: AddEmployeeDto) => item.email === dto.email || item.phone === dto.phone)) {
+        throw new BadGatewayException('Carrier is not registered in company');
+      }
+    }
     const user = await this.createUser(dto);
     const carrier = this.carrierRepository.create({
       id: user.id,
       physical_address: dto.physical_address,
       mc_dot_number: dto.mc_dot_number,
+      company
     });
     return await this.carrierRepository.save(carrier)
       .then(async (savedCarrier) => {

@@ -2,6 +2,7 @@ import { OrderEntity } from 'src/orders/entities/order.entity';
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { RolesEnum } from '../enums/roles.enum';
 import { CarrierEntity } from './carrier.entity';
+import { OperatorEntity } from './operator.entity';
 import { ShipperEntity } from './shipper.entity';
 
 @Entity()
@@ -24,4 +25,6 @@ export class UserEntity {
   carrier: CarrierEntity;
   @OneToOne(() => ShipperEntity, (e) => e.id, { nullable: true })
   shipper: ShipperEntity;
+  @OneToOne(() => OperatorEntity, (e) => e.id, { nullable: true })
+  operator: OperatorEntity;
 }

@@ -5,26 +5,29 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { config } from 'dotenv';
+import { CompanyEntity } from 'src/companies/entities/company.entity';
+import { CompaniesService } from 'src/companies/companies.service';
 
 config();
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly companiesService: CompaniesService,
   ) {}
 
-  async login(data: LoginDto): Promise<any> {
+  async loginUser(data: LoginDto): Promise<any> {
     const { login, password } = data;
-    const loginType: 'email' | 'phone' = this.defineLogin(login);
+    const isEmail: boolean = this.isEmail(login);
     const user: UserEntity =
-      loginType === 'email'
-        ? await this.userService.findOneByEmail(login)
-        : await this.userService.findOneByPhone(login);
+      isEmail
+        ? await this.usersService.findOneByEmail(login)
+        : await this.usersService.findOneByPhone(login);
     if (user) {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (isPasswordValid) {
+      const passwordValid = await bcrypt.compare(password, user.password);
+      if (passwordValid) {
         delete user.password;
         return { access_token: this.jwtService.sign({...user})};
       }
@@ -32,11 +35,24 @@ export class AuthService {
     throw new BadRequestException('Invalid login or password');
   }
 
-  defineLogin(login: string): 'email' | 'phone' {
+  async loginCompany(data: LoginDto): Promise<any> {
+    const { login, password } = data;
+    const isEmail: boolean = this.isEmail(login);
+    const company: CompanyEntity = isEmail ? await this.companiesService.findByEmail(login) : await this.companiesService.findByLogin(login);
+    if (company) {
+      const passwordValid: boolean = await bcrypt.compare(password, company.password);
+      if (passwordValid) {
+        delete company.password;
+        return { access_token: this.jwtService.sign(company)}
+      }
+    }
+  }
+
+  isEmail(login: string): boolean {
     const reg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
     if (reg.test(login)) {
-      return 'email';
+      return true;
     }
-    return 'phone';
+    return false
   }
 }
