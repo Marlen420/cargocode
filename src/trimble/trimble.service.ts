@@ -12,7 +12,7 @@ export class TrimbleService {
         private readonly redisService: RedisService
     ) {}
 
-    async getTruckRoute(startAddress: string, endAddress: string): Promise<any> {
+    async getLocation(startAddress: string, endAddress: string): Promise<any> {
         const url = `${this.singleSearchUrl}/${TrimbleRegions.WW}/api/search?authToken=${this.apiKey}`;
         const startAddressParams = {
             authToken: this.apiKey,
@@ -21,7 +21,8 @@ export class TrimbleService {
         };
         const endAddressParams = {
             authToken: this.apiKey,
-            query: encodeURIComponent(endAddress)
+            query: encodeURIComponent(endAddress),
+            maxResults: 1
         };
         try {
             const startLocation = await axios.get(url, { params: startAddressParams });
