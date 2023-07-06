@@ -98,24 +98,17 @@ export class OrdersService {
       data.destination,
     );
     const { Lat: originLat, Lon: originLon } =
-      location.start.locations[0].Coords;
+      location.start.Locations[0].Coords;
     const { Lat: destinationLat, Lon: destinationLon } =
-      location.start.locations[1].Coords;
+      location.end.Locations[0].Coords;
     order.origin_latitude = originLat;
     order.origin_longitude = originLon;
     order.destination_latitude = destinationLat;
     order.destination_longitude = destinationLon;
     Object.assign(order, data);
-    console.log(order);
-    return this.orderRepo.save(order).then(async (savedOrder) => {
-      console.log(`savedOrder`, savedOrder);
-      // await this.redisService.set(
-      //   `orders:ordersService:order:${savedOrder.id}`,
-      //   savedOrder,
-      // );
-      // await this.socketGateway.sendOrder(savedOrder);
-      // return savedOrder;
-    });
+    const savedOrder = await this.orderRepo.save(order);
+    await this.socketGateway.sendOrder(savedOrder);
+    return savedOrder;
   }
 
   /**
@@ -126,12 +119,7 @@ export class OrdersService {
    */
   async acceptOrder(req: Request, orderId: number): Promise<any> {
     const token = this.getDecodedToken(req);
-    let order: OrderEntity = await this.redisService.get(
-      `orders:ordersService:order:${orderId}`,
-    );
-    if (!order) {
-      order = await this.orderRepo.findOne({ where: { id: orderId } });
-    }
+    const order = await this.orderRepo.findOne({ where: { id: orderId } });
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }

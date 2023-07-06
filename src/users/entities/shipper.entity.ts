@@ -15,7 +15,7 @@ export class ShipperEntity {
   id: number;
   @Column()
   billing_address: string;
-  @OneToMany(() => OrderEntity, (e) => e.shipper)
+  @OneToMany(() => OrderEntity, (order) => order.shipper)
   orders: OrderEntity[];
   @OneToOne(() => UserEntity, (user) => user.shipper)
   @JoinColumn()

@@ -140,23 +140,16 @@ export class UsersService {
     id: number,
     options = { user: true },
   ): Promise<ShipperEntity> {
-    const shipper = await this.redisService.get(
-      `users:userService:shipper:${id}`,
-    );
     const user = await this.findOne(id);
     delete user.password;
-    if (shipper) {
-      return options.user ? { ...shipper, ...user } : shipper;
+    const shipper = await this.shipperRepository.findOne({
+      where: { user: { id } },
+    });
+    if (!shipper) {
+      throw new BadRequestException('Shipper not found');
     }
-    return await this.shipperRepository
-      .findOne({ where: { id } })
-      .then(async (savedShipper) => {
-        await this.redisService.set(
-          `users:userService:shipper:${id}`,
-          savedShipper,
-        );
-        return options.user ? { ...user, ...savedShipper } : savedShipper;
-      });
+    delete user.password;
+    return options.user ? { ...user, ...shipper } : shipper;
   }
 
   async findOneCarrier(
