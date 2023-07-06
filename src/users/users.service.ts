@@ -145,7 +145,7 @@ export class UsersService {
       });
       return { ...user, ...shipper };
     }
-    if(user.role === RolesEnum.CARRIER) {
+    if (user.role === RolesEnum.CARRIER) {
       const carrier = await this.carrierRepository.findOne({
         where: { user: { id } },
       });
@@ -174,24 +174,17 @@ export class UsersService {
     id: number,
     options = { user: true },
   ): Promise<CarrierEntity> {
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findOne({ where: { id } });
     delete user.password;
     const carrier = await this.carrierRepository.findOne({
       where: { user: { id } },
     });
-
     if (!carrier) {
       throw new BadRequestException('Carrier not found');
     }
-    return await this.carrierRepository
-      .findOne({ where: { id } })
-      .then(async (savedCarrier) => {
-        await this.redisService.set(
-          `users:userService:carrier:${id}`,
-          savedCarrier,
-        );
-        return options.user ? { ...user, ...savedCarrier } : savedCarrier;
-      });
+    return options.user
+      ? await this.carrierRepository.findOne({ where: { id } })
+      : carrier;
   }
 
   async remove(id: number): Promise<DeleteResult> {
