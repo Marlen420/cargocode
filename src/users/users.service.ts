@@ -156,13 +156,14 @@ export class UsersService {
     id: number,
     options = { user: true },
   ): Promise<CarrierEntity> {
-    const carrier = await this.redisService.get(
-      `users:userService:carrier:${id}`,
-    );
     const user = await this.findOne(id);
     delete user.password;
-    if (carrier) {
-      return options.user ? { ...user, ...carrier } : carrier;
+    const carrier = await this.carrierRepository.findOne({
+      where: { user: { id } },
+    });
+
+    if (!carrier) {
+      throw new BadRequestException('Carrier not found');
     }
     return await this.carrierRepository
       .findOne({ where: { id } })

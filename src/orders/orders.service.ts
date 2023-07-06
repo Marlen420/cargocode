@@ -127,6 +127,7 @@ export class OrdersService {
       token.id,
       { user: false },
     );
+    console.log(carrier)
     if (!carrier) {
       throw new BadRequestException("Couldn't accept the order");
     }
@@ -135,13 +136,7 @@ export class OrdersService {
     }
     order.status = OrderStatus.accepted;
     order.carrier = carrier;
-    return this.orderRepo.save(order).then(async (savedOrder) => {
-      await this.redisService.set(
-        `orders:ordersService:order:${orderId}`,
-        savedOrder,
-      );
-      return savedOrder;
-    });
+    return this.orderRepo.save(order);
   }
 
   /**

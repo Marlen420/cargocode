@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   UploadedFile,
@@ -80,8 +81,8 @@ export class OrdersController {
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Accept order' })
-  @Post('accept-order')
-  async acceptOrder(@Req() req: Request, @Body('orderId') orderId: number) {
+  @Put('accept-order')
+  async acceptOrder(@Req() req: Request, @Param('orderId') orderId: number) {
     return this.ordersService.acceptOrder(req, orderId);
   }
 

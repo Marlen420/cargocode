@@ -46,7 +46,7 @@ config();
     TrimbleModule,
     StripeModule,
     AwsS3Module,
-    MessagesModule
+    MessagesModule,
   ],
   controllers: [StripeController],
   providers: [
