@@ -207,20 +207,19 @@ export class OrdersService {
     file: Express.Multer.File,
   ): Promise<OrderEntity> {
     const token = this.getDecodedToken(req);
-    let order: OrderEntity = await this.redisService.get(
-      `orders:ordersService:order:${id}`,
-    );
-    if (order?.carrier.id !== token.id) {
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: {
+        carrier: {
+          user: true,
+        },
+      },
+    });
+    if (order?.carrier.user.id !== token.id) {
       throw new BadRequestException('Forbidden resource');
     }
-    if (!order) {
-      order = await this.orderRepo.findOne({ where: { id } });
-      if (!order) {
-        throw new BadRequestException("Order doesn't exist");
-      }
-    }
-    if (order.status !== OrderStatus.on_way) {
-      throw new BadRequestException('Order is not on way');
+    if (order.status !== OrderStatus.delivered) {
+      throw new BadRequestException('Order is not delivered')
     }
     if (!file) {
       throw new BadRequestException('No file provided');
