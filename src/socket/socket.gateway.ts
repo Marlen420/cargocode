@@ -22,9 +22,7 @@ export class SocketGateway {
   @WebSocketServer()
   private server: Server;
 
-  constructor(
-    private readonly messagesService: MessagesService
-  ) {}
+  constructor(private readonly messagesService: MessagesService) {}
 
   async handleConnection(client: Socket) {
     // console.log('Client connected: ', client.id);
@@ -39,7 +37,7 @@ export class SocketGateway {
   }
 
   @SubscribeMessage('orders:get-room-messages')
-  async getRoomMessages(client, {userId, orderId}) {
+  async getRoomMessages(client, { userId, orderId }) {
     const messages = await this.messagesService.findMessageByRoom(orderId);
     console.log('Client ID: ', client.id);
     this.server.to(client.id).emit('orders:receive-room-messages', {data: messages, orderId});

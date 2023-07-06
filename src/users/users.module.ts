@@ -21,7 +21,7 @@ import { MessageEntity } from 'src/messages/entities/message.entity';
       ShipperEntity,
       CarrierEntity,
       OperatorEntity,
-      CompanyEntity
+      CompanyEntity,
     ]),
     RedisModule,
     CompaniesModule,

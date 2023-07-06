@@ -133,6 +133,24 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
+    if (user.role === RolesEnum.OPERATOR) {
+      const operator = await this.operatorRepository.findOne({
+        where: { user: { id } },
+      });
+      return { ...user, ...operator };
+    }
+    if (user.role === RolesEnum.SHIPPER) {
+      const shipper = await this.shipperRepository.findOne({
+        where: { user: { id } },
+      });
+      return { ...user, ...shipper };
+    }
+    if (user.role === RolesEnum.CARRIER) {
+      const carrier = await this.carrierRepository.findOne({
+        where: { user: { id } },
+      });
+      return { ...user, ...carrier };
+    }
     return user;
   }
 
@@ -156,23 +174,17 @@ export class UsersService {
     id: number,
     options = { user: true },
   ): Promise<CarrierEntity> {
-    const carrier = await this.redisService.get(
-      `users:userService:carrier:${id}`,
-    );
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findOne({ where: { id } });
     delete user.password;
-    if (carrier) {
-      return options.user ? { ...user, ...carrier } : carrier;
+    const carrier = await this.carrierRepository.findOne({
+      where: { user: { id } },
+    });
+    if (!carrier) {
+      throw new BadRequestException('Carrier not found');
     }
-    return await this.carrierRepository
-      .findOne({ where: { id } })
-      .then(async (savedCarrier) => {
-        await this.redisService.set(
-          `users:userService:carrier:${id}`,
-          savedCarrier,
-        );
-        return options.user ? { ...user, ...savedCarrier } : savedCarrier;
-      });
+    return options.user
+      ? await this.carrierRepository.findOne({ where: { id } })
+      : carrier;
   }
 
   async remove(id: number): Promise<DeleteResult> {

@@ -9,16 +9,11 @@ import { SocketGateway } from './socket.gateway';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      MessageEntity
-    ]),
+    TypeOrmModule.forFeature([MessageEntity]),
     UsersModule,
-    MessagesModule
+    MessagesModule,
   ],
-  providers: [
-    SocketGateway,
-    MessagesService
-  ],
+  providers: [SocketGateway, MessagesService],
   exports: [SocketGateway],
 })
 export class SocketModule {}
