@@ -21,6 +21,8 @@ import { ShipperEntity } from 'src/users/entities/shipper.entity';
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { OrderStatus } from './enums/orderStatus.enum';
 import { SocketGateway } from 'src/socket/socket.gateway';
+import { S3Service } from '../aws-s3/aws-s3.service';
+import { ValidationError } from 'class-validator';
 
 /**
  * Interface of decoded user bearer token
@@ -41,7 +43,9 @@ export class OrdersService {
    * @param jwtService jwt service
    * @param mapboxService mapbox service
    * @param usersService users servuce
+   * @param socketGateway
    * @param orderRepo order entity repository
+   * @param s3Service
    */
   constructor(
     private readonly redisService: RedisService,
@@ -51,6 +55,7 @@ export class OrdersService {
     private readonly socketGateway: SocketGateway,
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
+    private s3Service: S3Service,
   ) {}
 
   /**
@@ -236,7 +241,20 @@ export class OrdersService {
       return savedOrder;
     });
   }
-
+  async uploadAcceptanceImage(id: number, file: Express.Multer.File) {
+    const registeredOrder = await this.orderRepo.findOne({
+      where: { id },
+    });
+    if (!registeredOrder) {
+      throw new BadRequestException("Order doesn't exist");
+    }
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    const bucketKey = `${file.fieldname}${Date.now()}`;
+    const fileUrl = await this.s3Service.uploadFile(file, bucketKey);
+    return this.orderRepo.update({ id }, { acceptance_image: fileUrl });
+  }
   /**
    * Enables order by provided id
    * @param id id of order to disable

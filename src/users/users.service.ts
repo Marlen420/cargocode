@@ -94,6 +94,7 @@ export class UsersService {
     if (dto.company_id !== -1) {
       company = await this.companiesService.findById(dto.company_id);
       if (
+        company &&
         !company.employees_credential.some(
           (item: AddEmployeeDto) =>
             item.email === dto.email || item.phone === dto.phone,
