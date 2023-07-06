@@ -14,6 +14,7 @@ import { TrimbleModule } from './trimble/trimble.module';
 import { UsersModule } from './users/users.module';
 import { StripeController } from './stripe/stripe.controller';
 import { StripeModule } from './stripe/stripe.module';
+import { AwsS3Module } from './aws-s3/aws-s3.module';
 
 config();
 @Module({
@@ -42,6 +43,7 @@ config();
     OrdersModule,
     TrimbleModule,
     StripeModule,
+    AwsS3Module,
   ],
   controllers: [StripeController],
   providers: [
