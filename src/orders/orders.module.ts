@@ -19,6 +19,7 @@ import { OrdersService } from './orders.service';
 import { AwsS3Module } from '../aws-s3/aws-s3.module';
 import { TrimbleService } from 'src/trimble/trimble.service';
 import { TrimbleModule } from 'src/trimble/trimble.module';
+import { MessagesModule } from 'src/messages/messages.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { TrimbleModule } from 'src/trimble/trimble.module';
     SocketModule,
     AwsS3Module,
     TrimbleModule,
+    MessagesModule,
   ],
   controllers: [OrdersController],
   providers: [
