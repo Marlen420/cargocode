@@ -23,6 +23,7 @@ import { OrderStatus } from './enums/orderStatus.enum';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { S3Service } from '../aws-s3/aws-s3.service';
 import { ValidationError } from 'class-validator';
+import { TrimbleService } from 'src/trimble/trimble.service';
 
 /**
  * Interface of decoded user bearer token
@@ -51,6 +52,7 @@ export class OrdersService {
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
     private readonly mapboxService: MapboxService,
+    private readonly trimbleService: TrimbleService,
     private readonly usersService: UsersService,
     private readonly socketGateway: SocketGateway,
     @InjectRepository(OrderEntity)
@@ -91,6 +93,13 @@ export class OrdersService {
     const order: OrderEntity = new OrderEntity();
     order.shipper = shipper;
     order.status = OrderStatus.waiting;
+    const location = await this.trimbleService.getLocation(data.pickup_location, data.destination);
+    const { Lat: originLat,  Lon: originLon } = location.start.locations[0].Coords;
+    const { Lat: destinationLat,  Lon: destinationLon } = location.start.locations[1].Coords;
+    order.origin_latitude = originLat;
+    order.origin_longitude = originLon;
+    order.destination_latitude = destinationLat;
+    order.destination_longitude = destinationLon;
     Object.assign(order, data);
     return this.orderRepo.save(order).then(async (savedOrder) => {
       await this.redisService.set(
