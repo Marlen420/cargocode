@@ -17,6 +17,8 @@ import { OrderEntity } from './entities/order.entity';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { AwsS3Module } from '../aws-s3/aws-s3.module';
+import { TrimbleService } from 'src/trimble/trimble.service';
+import { TrimbleModule } from 'src/trimble/trimble.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { AwsS3Module } from '../aws-s3/aws-s3.module';
     CompaniesModule,
     SocketModule,
     AwsS3Module,
+    TrimbleModule
   ],
   controllers: [OrdersController],
   providers: [
@@ -42,6 +45,7 @@ import { AwsS3Module } from '../aws-s3/aws-s3.module';
     MapboxService,
     UsersService,
     SocketGateway,
+    TrimbleService
   ],
 })
 export class OrdersModule {}
