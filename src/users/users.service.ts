@@ -100,7 +100,7 @@ export class UsersService {
             item.email === dto.email || item.phone === dto.phone,
         )
       ) {
-        throw new BadGatewayException('Carrier is not registered in company');
+        throw new BadRequestException('Carrier is not registered in company');
       }
     }
     const user = await this.createUser(dto);
