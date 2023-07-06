@@ -51,4 +51,6 @@ export class OrderEntity {
   status: OrderStatus;
   @Column({ type: 'boolean', default: true })
   active: boolean;
+  @Column({ type: 'varchar', nullable: true })
+  acceptance_image: string;
 }

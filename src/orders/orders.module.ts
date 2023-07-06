@@ -16,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 import { OrderEntity } from './entities/order.entity';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
+import { AwsS3Module } from '../aws-s3/aws-s3.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OrdersService } from './orders.service';
     RedisModule,
     CompaniesModule,
     SocketModule,
+    AwsS3Module,
   ],
   controllers: [OrdersController],
   providers: [

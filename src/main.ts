@@ -2,7 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { config } from 'dotenv';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  DocumentBuilder,
+  OpenAPIObject,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import * as ip from 'ip';
 config();
 const PORT = process.env.PORT || 3000;
@@ -15,7 +20,9 @@ async function bootstrap(): Promise<void> {
     .setTitle('Title')
     .setDescription('Description')
     .setVersion('')
+    .addBearerAuth()
     .build();
+
   const document: OpenAPIObject = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('', app, document);
   await app.listen(PORT, () => {

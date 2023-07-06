@@ -7,9 +7,18 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -18,8 +27,10 @@ import { CreateOrderDto } from './dto/createOrder.dto';
 import { PriceEstimateDto } from './dto/priceEstimate.dto';
 import { OrderEntity } from './entities/order.entity';
 import { OrdersService } from './orders.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Orders')
+@ApiBearerAuth()
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
@@ -34,8 +45,8 @@ export class OrdersController {
     return this.ordersService.priceEstimate(data);
   }
 
-  //   @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
-  //   @UseGuards(RolesGuard)
+  // @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
+  // @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all orders' })
   @Get()
   async getOrders(): Promise<OrderEntity[]> {
@@ -89,7 +100,29 @@ export class OrdersController {
   async finishShipping(@Req() req: Request, @Body('orderId') orderId: number) {
     return this.ordersService.finishShipping(req, orderId);
   }
-
+  @Roles(RolesEnum.CARRIER)
+  @UseGuards(RolesGuard)
+  @ApiOperation({ summary: 'Upload acceptance image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('upload-acceptance-image/:id')
+  async uploadAcceptanceImage(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.ordersService.uploadAcceptanceImage(id, file);
+  }
   @Roles(RolesEnum.SHIPPER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Enables order' })
