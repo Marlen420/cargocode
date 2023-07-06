@@ -1,8 +1,4 @@
-import {
-  BadGatewayException,
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
@@ -18,6 +14,7 @@ import { CompanyEntity } from 'src/companies/entities/company.entity';
 import { AddEmployeeDto } from 'src/companies/dto/add-employee.dto';
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { OperatorEntity } from './entities/operator.entity';
+import { RolesEnum } from './enums/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -117,19 +114,26 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string): Promise<UserEntity> {
-    return this.userRepository.findOne({ where: { email } });
+    return this.userRepository.findOne({
+      where: { email },
+    });
   }
 
   async findOneByPhone(phone: string): Promise<UserEntity> {
-    return this.userRepository.findOne({ where: { phone } });
+    return this.userRepository.findOne({
+      where: { phone },
+    });
   }
 
   async findOne(id: number): Promise<UserEntity> {
-    const user = await this.redisService.get(`users:userService:user:${id}`);
-    if (user) {
-      return user;
+    const user = await this.userRepository.findOne({
+      select: ['id', 'firstname', 'lastname', 'phone', 'email', 'role'],
+      where: { id },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
-    return await this.userRepository.findOne({ where: { id } });
+    return user;
   }
 
   async findOneShipper(
@@ -179,6 +183,12 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<DeleteResult> {
+    const user = await this.findOne(id);
+    if (user.role === RolesEnum.CARRIER) {
+      await this.carrierRepository.delete({ user: { id } });
+      return await this.userRepository.delete({ id });
+    }
+    await this.shipperRepository.delete({ user: { id } });
     return await this.userRepository.delete({ id });
   }
   private async hashPassword(pass: string): Promise<string> {

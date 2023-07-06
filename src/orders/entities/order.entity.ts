@@ -35,13 +35,13 @@ export class OrderEntity {
   pickup_location: string;
   @Column({ type: 'varchar', length: 256 })
   destination: string;
-  @Column({type: 'varchar', length: 20})
+  @Column({ type: 'varchar', length: 20 })
   origin_latitude: string;
-  @Column({type: 'varchar', length: 20})
+  @Column({ type: 'varchar', length: 20 })
   origin_longitude: string;
-  @Column({type: 'varchar', length: 20})
+  @Column({ type: 'varchar', length: 20 })
   destination_latitude: string;
-  @Column({type: 'varchar', length: 20})
+  @Column({ type: 'varchar', length: 20 })
   destination_longitude: string;
   @Column({ type: 'date', nullable: false })
   pickup_date: Date;

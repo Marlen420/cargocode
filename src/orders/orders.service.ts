@@ -93,9 +93,14 @@ export class OrdersService {
     const order: OrderEntity = new OrderEntity();
     order.shipper = shipper;
     order.status = OrderStatus.waiting;
-    const location = await this.trimbleService.getLocation(data.pickup_location, data.destination);
-    const { Lat: originLat,  Lon: originLon } = location.start.locations[0].Coords;
-    const { Lat: destinationLat,  Lon: destinationLon } = location.start.locations[1].Coords;
+    const location = await this.trimbleService.getLocation(
+      data.pickup_location,
+      data.destination,
+    );
+    const { Lat: originLat, Lon: originLon } =
+      location.start.locations[0].Coords;
+    const { Lat: destinationLat, Lon: destinationLon } =
+      location.start.locations[1].Coords;
     order.origin_latitude = originLat;
     order.origin_longitude = originLon;
     order.destination_latitude = destinationLat;

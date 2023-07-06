@@ -36,7 +36,7 @@ import { TrimbleModule } from 'src/trimble/trimble.module';
     CompaniesModule,
     SocketModule,
     AwsS3Module,
-    TrimbleModule
+    TrimbleModule,
   ],
   controllers: [OrdersController],
   providers: [
@@ -45,7 +45,7 @@ import { TrimbleModule } from 'src/trimble/trimble.module';
     MapboxService,
     UsersService,
     SocketGateway,
-    TrimbleService
+    TrimbleService,
   ],
 })
 export class OrdersModule {}
