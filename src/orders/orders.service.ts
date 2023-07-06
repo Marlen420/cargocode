@@ -93,22 +93,22 @@ export class OrdersService {
     const order: OrderEntity = new OrderEntity();
     order.shipper = shipper;
     order.status = OrderStatus.waiting;
-    const location = await this.trimbleService.getLocation(data.pickup_location, data.destination);
-    const { Lat: originLat,  Lon: originLon } = location.start.locations[0].Coords;
-    const { Lat: destinationLat,  Lon: destinationLon } = location.start.locations[1].Coords;
+    const location = await this.trimbleService.getLocation(
+      data.pickup_location,
+      data.destination,
+    );
+    const { Lat: originLat, Lon: originLon } =
+      location.start.Locations[0].Coords;
+    const { Lat: destinationLat, Lon: destinationLon } =
+      location.end.Locations[0].Coords;
     order.origin_latitude = originLat;
     order.origin_longitude = originLon;
     order.destination_latitude = destinationLat;
     order.destination_longitude = destinationLon;
     Object.assign(order, data);
-    return this.orderRepo.save(order).then(async (savedOrder) => {
-      await this.redisService.set(
-        `orders:ordersService:order:${savedOrder.id}`,
-        savedOrder,
-      );
-      await this.socketGateway.sendOrder(savedOrder);
-      return savedOrder;
-    });
+    const savedOrder = await this.orderRepo.save(order);
+    await this.socketGateway.sendOrder(savedOrder);
+    return savedOrder;
   }
 
   /**
@@ -119,12 +119,7 @@ export class OrdersService {
    */
   async acceptOrder(req: Request, orderId: number): Promise<any> {
     const token = this.getDecodedToken(req);
-    let order: OrderEntity = await this.redisService.get(
-      `orders:ordersService:order:${orderId}`,
-    );
-    if (!order) {
-      order = await this.orderRepo.findOne({ where: { id: orderId } });
-    }
+    const order = await this.orderRepo.findOne({ where: { id: orderId } });
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }
@@ -305,7 +300,15 @@ export class OrdersService {
    * @returns {Promise<OrderEntity[]>} array of orders
    */
   async getOrders(): Promise<OrderEntity[]> {
-    const orders: OrderEntity[] = await this.orderRepo.find();
+    const orders = await this.orderRepo.find({
+      relations: {
+        shipper: {
+          user: true,
+        },
+        carrier: true,
+      },
+    });
+
     return orders;
   }
 

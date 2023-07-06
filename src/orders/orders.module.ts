@@ -38,7 +38,7 @@ import { MessagesModule } from 'src/messages/messages.module';
     SocketModule,
     AwsS3Module,
     TrimbleModule,
-    MessagesModule
+    MessagesModule,
   ],
   controllers: [OrdersController],
   providers: [
@@ -47,7 +47,7 @@ import { MessagesModule } from 'src/messages/messages.module';
     MapboxService,
     UsersService,
     SocketGateway,
-    TrimbleService
+    TrimbleService,
   ],
 })
 export class OrdersModule {}

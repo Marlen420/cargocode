@@ -3,16 +3,17 @@ import { OrderEntity } from 'src/orders/entities/order.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 @Entity()
 export class CarrierEntity {
-  @PrimaryColumn()
-  @OneToOne(() => UserEntity, (e) => e.id)
+  @PrimaryGeneratedColumn()
   id: number;
   @Column()
   physical_address: string;
@@ -22,4 +23,7 @@ export class CarrierEntity {
   orders: OrderEntity[];
   @ManyToOne(() => CompanyEntity, (e) => e.carriers, { nullable: true })
   company: CompanyEntity;
+  @OneToOne(() => UserEntity, (user) => user.carrier)
+  @JoinColumn()
+  user: UserEntity;
 }
