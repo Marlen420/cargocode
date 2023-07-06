@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -34,8 +34,8 @@ export class OrdersController {
     return this.ordersService.priceEstimate(data);
   }
 
-  @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
-  @UseGuards(RolesGuard)
+//   @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
+//   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all orders' })
   @Get()
   async getOrders(): Promise<OrderEntity[]> {
@@ -110,5 +110,12 @@ export class OrdersController {
     @Param('id') id: string,
   ): Promise<OrderEntity> {
     return this.ordersService.disableOrder(req, +id);
+  }
+
+  @ApiOperation({ summary: 'Send message to client through web socket'})
+  @ApiBody({})
+  @Post('send-message')
+  async sendMessage(@Body() data: any) {
+      return this.ordersService.sendMessage(data);
   }
 }

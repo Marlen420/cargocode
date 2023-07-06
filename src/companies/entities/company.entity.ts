@@ -7,8 +7,8 @@ import { AddEmployeeDto } from '../dto/add-employee.dto';
 export class CompanyEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
-  role: RolesEnum.COMPANY;
+  @Column({default: RolesEnum.COMPANY})
+  role: RolesEnum;
   @Column()
   name: string;
   @Column()
@@ -21,7 +21,7 @@ export class CompanyEntity {
   email: string;
   @Column()
   password: string;
-  @Column({ array: true, type: 'json' })
+  @Column({ array: true, type: 'json', default: []})
   employees_credential: AddEmployeeDto[];
   @OneToMany(() => CarrierEntity, (carrier) => carrier.company, { eager: true })
   carriers: CarrierEntity[];

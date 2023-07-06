@@ -80,7 +80,7 @@ export class CompaniesService {
       throw new BadRequestException('This email already signed up');
     }
     const salt = await bcrypt.genSalt(10);
-    company.password = await bcrypt.hash(company.password, salt);
+    data.password = await bcrypt.hash(data.password, salt);
     return this.companyRepository.save(data);
   }
 
