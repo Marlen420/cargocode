@@ -20,10 +20,10 @@ export class UserEntity {
   password: string;
   @Column({ enum: RolesEnum })
   role: RolesEnum;
-  @OneToOne(() => CarrierEntity, (e) => e.id, { nullable: true })
+  @OneToOne(() => CarrierEntity, (e) => e.user, { nullable: true })
   carrier: CarrierEntity;
-  @OneToOne(() => ShipperEntity, (e) => e.id, { nullable: true })
+  @OneToOne(() => ShipperEntity, (e) => e.user, { nullable: true })
   shipper: ShipperEntity;
-  @OneToOne(() => OperatorEntity, (e) => e.id, { nullable: true })
+  @OneToOne(() => OperatorEntity, (e) => e.user, { nullable: true })
   operator: OperatorEntity;
 }

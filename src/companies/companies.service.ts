@@ -40,27 +40,33 @@ export class CompaniesService {
    * Returns copmany by provided id
    */
   async findById(id: number): Promise<CompanyEntity> {
-    const company: CompanyEntity = await this.redisService.get(
-      `companies:companiesService:company:${id}`,
-    );
-    if (company) {
-      return company;
+    const company = await this.companyRepository.findOne({ where: { id } });
+    if (!company) {
+      throw new BadRequestException('Company not found');
     }
-    return this.companyRepository.findOne({ where: { id } });
+    return company;
   }
 
   /**
    * Finds company by provided email
    */
   async findByEmail(email: string): Promise<CompanyEntity> {
-    return this.companyRepository.findOne({ where: { email } });
+    const company = await this.companyRepository.findOne({ where: { email } });
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
+    return company;
   }
 
   /**
    * Finds company by provided login
    */
   async findByLogin(login: string): Promise<CompanyEntity> {
-    return this.companyRepository.findOne({ where: { login } });
+    const company = await this.companyRepository.findOne({ where: { login } });
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
+    return company;
   }
 
   /**
@@ -95,14 +101,9 @@ export class CompaniesService {
     if (!data.email && !data.phone) {
       throw new BadRequestException('Must be provided at least one option');
     }
-    let company: CompanyEntity = await this.redisService.get(
-      `companies:companiesService:company:${token.id}`,
-    );
-    if (!company) {
-      company = await this.companyRepository.findOne({
-        where: { id: token.id },
-      });
-    }
+    const company = await this.companyRepository.findOne({
+      where: { id: token.id },
+    });
     if (
       company.employees_credential.some(
         (item: AddEmployeeDto) =>
@@ -112,19 +113,17 @@ export class CompaniesService {
       throw new BadRequestException('Credential already added');
     }
     company.employees_credential.push(data);
-    return this.companyRepository.save(company).then(async (savedCompany) => {
-      await this.redisService.set(
-        `companies:companiesService:company:${token.id}`,
-        savedCompany,
-      );
-      return savedCompany;
-    });
+    return this.companyRepository.save(company);
   }
 
   /**
    * Deletes company by provided id
    */
   async deleteById(id: number): Promise<DeleteResult> {
+    const company = await this.companyRepository.findOne({ where: { id } });
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
     return this.companyRepository.delete(id);
   }
 

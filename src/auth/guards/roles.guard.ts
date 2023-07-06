@@ -31,7 +31,7 @@ export class RolesGuard implements CanActivate {
     }
     try {
       const { headers }: Request = context.switchToHttp().getRequest();
-      let token: string = headers.authorization.split(' ')[1];
+      const token: string = headers.authorization.split(' ')[1];
       const decodedToken = this.jwtService.verify(token) as UserToken;
       return requiredRoles.some(
         (role) => role === 'ALL' || role === decodedToken.role,
