@@ -30,7 +30,6 @@ import { Roles } from 'src/auth/decorators/role.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Create a new operator' })

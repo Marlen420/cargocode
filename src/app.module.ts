@@ -14,7 +14,6 @@ import { TrimbleModule } from './trimble/trimble.module';
 import { UsersModule } from './users/users.module';
 import { StripeController } from './stripe/stripe.controller';
 import { StripeModule } from './stripe/stripe.module';
-import { SocketModule } from './socket/socket.module';
 import { SocketGateway } from './socket/socket.gateway';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 
@@ -54,7 +53,7 @@ config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    SocketGateway
+    SocketGateway,
   ],
 })
 export class AppModule {}

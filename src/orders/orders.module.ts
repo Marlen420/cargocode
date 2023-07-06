@@ -25,15 +25,21 @@ import { OrdersService } from './orders.service';
       ShipperEntity,
       CarrierEntity,
       OperatorEntity,
-      SocketModule
+      SocketModule,
     ]),
     MapboxModule,
     UsersModule,
     RedisModule,
     CompaniesModule,
-    SocketModule
+    SocketModule,
   ],
   controllers: [OrdersController],
-  providers: [RedisService, OrdersService, MapboxService, UsersService, SocketGateway],
+  providers: [
+    RedisService,
+    OrdersService,
+    MapboxService,
+    UsersService,
+    SocketGateway,
+  ],
 })
 export class OrdersModule {}
