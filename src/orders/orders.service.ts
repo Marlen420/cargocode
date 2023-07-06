@@ -127,7 +127,7 @@ export class OrdersService {
       token.id,
       { user: false },
     );
-    console.log(carrier)
+    console.log(carrier);
     if (!carrier) {
       throw new BadRequestException("Couldn't accept the order");
     }
