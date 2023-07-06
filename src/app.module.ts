@@ -16,6 +16,7 @@ import { StripeController } from './stripe/stripe.controller';
 import { StripeModule } from './stripe/stripe.module';
 import { SocketGateway } from './socket/socket.gateway';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
+import { MessagesModule } from './messages/messages.module';
 
 config();
 @Module({
@@ -45,6 +46,7 @@ config();
     TrimbleModule,
     StripeModule,
     AwsS3Module,
+    MessagesModule
   ],
   controllers: [StripeController],
   providers: [
