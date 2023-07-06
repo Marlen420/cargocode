@@ -20,6 +20,7 @@ import { RolesEnum } from 'src/users/enums/roles.enum';
 import { ShipperEntity } from 'src/users/entities/shipper.entity';
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { OrderStatus } from './enums/orderStatus.enum';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 /**
  * Interface of decoded user bearer token
@@ -47,6 +48,7 @@ export class OrdersService {
     private readonly jwtService: JwtService,
     private readonly mapboxService: MapboxService,
     private readonly usersService: UsersService,
+    private readonly socketGateway: SocketGateway,
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
   ) {}
@@ -90,6 +92,7 @@ export class OrdersService {
         `orders:ordersService:order:${savedOrder.id}`,
         savedOrder,
       );
+      await this.socketGateway.sendOrder(savedOrder);
       return savedOrder;
     });
   }
@@ -315,6 +318,11 @@ export class OrdersService {
       user: false,
     });
     return this.orderRepo.find({ where: { shipper: { id: shipper.id } } });
+  }
+
+  async sendMessage(message: any) {
+    console.log('Service');
+    return await this.socketGateway.sendOrder(message);
   }
 
   private getDecodedToken(req: Request): UserToken {

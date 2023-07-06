@@ -5,6 +5,8 @@ import { MapboxModule } from 'src/mapbox/mapbox.module';
 import { MapboxService } from 'src/mapbox/mapbox.service';
 import { RedisModule } from 'src/redis/redis.module';
 import { RedisService } from 'src/redis/redis.service';
+import { SocketGateway } from 'src/socket/socket.gateway';
+import { SocketModule } from 'src/socket/socket.module';
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { OperatorEntity } from 'src/users/entities/operator.entity';
 import { ShipperEntity } from 'src/users/entities/shipper.entity';
@@ -23,13 +25,15 @@ import { OrdersService } from './orders.service';
       ShipperEntity,
       CarrierEntity,
       OperatorEntity,
+      SocketModule
     ]),
     MapboxModule,
     UsersModule,
     RedisModule,
     CompaniesModule,
+    SocketModule
   ],
   controllers: [OrdersController],
-  providers: [RedisService, OrdersService, MapboxService, UsersService],
+  providers: [RedisService, OrdersService, MapboxService, UsersService, SocketGateway],
 })
 export class OrdersModule {}

@@ -14,6 +14,8 @@ import { TrimbleModule } from './trimble/trimble.module';
 import { UsersModule } from './users/users.module';
 import { StripeController } from './stripe/stripe.controller';
 import { StripeModule } from './stripe/stripe.module';
+import { SocketModule } from './socket/socket.module';
+import { SocketGateway } from './socket/socket.gateway';
 
 config();
 @Module({
@@ -41,7 +43,7 @@ config();
     MapboxModule,
     OrdersModule,
     TrimbleModule,
-    StripeModule,
+    StripeModule
   ],
   controllers: [StripeController],
   providers: [
@@ -50,6 +52,7 @@ config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    SocketGateway
   ],
 })
 export class AppModule {}
