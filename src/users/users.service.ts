@@ -70,23 +70,12 @@ export class UsersService {
 
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
     const user = await this.createUser(dto);
-    return await this.shipperRepository
-      .save({
-        id: user.id,
-        billing_address: dto.billing_address,
-      })
-      .then(async (savedShipper) => {
-        const user = await this.findOne(savedShipper.id);
-        delete user.password;
-        return { ...savedShipper, ...user };
-      })
-      .then(async (savedShipper) => {
-        await this.redisService.set(
-          `users:usersService:shipper:${savedShipper.id}`,
-          savedShipper,
-        );
-        return savedShipper;
-      });
+    const registeredShipper = await this.shipperRepository.save({
+      billing_address: dto.billing_address,
+      user,
+    });
+    delete registeredShipper.user.password;
+    return registeredShipper;
   }
 
   async createCarrier(dto: CreateCarrierDto): Promise<CarrierEntity> {
@@ -105,25 +94,14 @@ export class UsersService {
     }
     const user = await this.createUser(dto);
     const carrier = this.carrierRepository.create({
-      id: user.id,
       physical_address: dto.physical_address,
       mc_dot_number: dto.mc_dot_number,
       company,
+      user,
     });
-    return await this.carrierRepository
-      .save(carrier)
-      .then(async (savedCarrier) => {
-        const user = await this.findOne(savedCarrier.id);
-        delete user.password;
-        return { ...savedCarrier, ...user };
-      })
-      .then(async (savedCarrier) => {
-        await this.redisService.set(
-          `users:usersService:carrier:${savedCarrier.id}`,
-          savedCarrier,
-        );
-        return savedCarrier;
-      });
+    const registeredCarrier = await this.carrierRepository.save(carrier);
+    delete registeredCarrier.user.password;
+    return registeredCarrier;
   }
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const registeredUser = await this.userRepository.findOne({

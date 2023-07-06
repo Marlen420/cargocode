@@ -92,13 +92,15 @@ export class OrdersService {
     order.shipper = shipper;
     order.status = OrderStatus.waiting;
     Object.assign(order, data);
+    console.log(order);
     return this.orderRepo.save(order).then(async (savedOrder) => {
-      await this.redisService.set(
-        `orders:ordersService:order:${savedOrder.id}`,
-        savedOrder,
-      );
-      await this.socketGateway.sendOrder(savedOrder);
-      return savedOrder;
+      console.log(`savedOrder`, savedOrder);
+      // await this.redisService.set(
+      //   `orders:ordersService:order:${savedOrder.id}`,
+      //   savedOrder,
+      // );
+      // await this.socketGateway.sendOrder(savedOrder);
+      // return savedOrder;
     });
   }
 
@@ -296,7 +298,15 @@ export class OrdersService {
    * @returns {Promise<OrderEntity[]>} array of orders
    */
   async getOrders(): Promise<OrderEntity[]> {
-    const orders: OrderEntity[] = await this.orderRepo.find();
+    const orders = await this.orderRepo.find({
+      relations: {
+        shipper: {
+          user: true,
+        },
+        carrier: true,
+      },
+    });
+
     return orders;
   }
 
