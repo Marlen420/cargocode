@@ -74,8 +74,8 @@ export class UsersController {
     return this.usersService.createShipper(createShipperDto);
   }
 
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(RolesGuard)
+  // @Roles(RolesEnum.ADMIN)
+  // @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users' })
   @ApiResponse({ status: 404, description: 'No users found' })
