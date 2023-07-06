@@ -50,22 +50,12 @@ export class UsersService {
       throw new BadRequestException('Employee not registered in company');
     }
     const user = await this.createUser(dto);
-    return await this.operatorRepository
-      .save({
-        id: user.id,
-      })
-      .then(async (savedEmployee) => {
-        const user = await this.findOne(savedEmployee.id);
-        delete user.password;
-        return { ...savedEmployee, ...user };
-      })
-      .then(async (savedEmployee) => {
-        await this.redisService.set(
-          `users:usersService:employee:${savedEmployee.id}`,
-          savedEmployee,
-        );
-        return savedEmployee;
-      });
+    const operator = this.operatorRepository.create({
+      user,
+    });
+    const registeredOperator = await this.operatorRepository.save(operator);
+    delete registeredOperator.user.password;
+    return registeredOperator;
   }
 
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
