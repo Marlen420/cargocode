@@ -89,22 +89,24 @@ export class OrdersController {
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Start shipping accepted order' })
-  @Post('start-shipping')
-  async startShipping(@Req() req: Request, @Body('orderId') orderId: number) {
+  @Put('start-shipping')
+  async startShipping(@Req() req: Request, @Param('orderId') orderId: number) {
     return this.ordersService.startShipping(req, orderId);
+  }
+  @Roles(RolesEnum.CARRIER)
+  @UseGuards(RolesGuard)
+  @ApiOperation({ summary: 'Start shipping accepted order' })
+  @Put('delivered-shipping')
+  async deliveredShipping(
+    @Req() req: Request,
+    @Param('orderId') orderId: number,
+  ) {
+    return this.ordersService.deliveredShipping(req, orderId);
   }
 
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Finish shipping accepted order' })
-  @Post('finish-shipping')
-  async finishShipping(@Req() req: Request, @Body('orderId') orderId: number) {
-    return this.ordersService.finishShipping(req, orderId);
-  }
-  @Roles(RolesEnum.CARRIER)
-  @UseGuards(RolesGuard)
-  @ApiOperation({ summary: 'Upload acceptance image' })
-  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
@@ -116,14 +118,17 @@ export class OrdersController {
       },
     },
   })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  @Patch('upload-acceptance-image/:id')
-  async uploadAcceptanceImage(
-    @Param('id') id: number,
+  @Put('finish-shipping')
+  async finishShipping(
+    @Req() req: Request,
+    @Param('orderId') orderId: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.ordersService.uploadAcceptanceImage(id, file);
+    return this.ordersService.finishShipping(req, orderId, file);
   }
+
   @Roles(RolesEnum.SHIPPER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Enables order' })

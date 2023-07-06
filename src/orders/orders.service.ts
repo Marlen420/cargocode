@@ -138,7 +138,31 @@ export class OrdersService {
     order.carrier = carrier;
     return this.orderRepo.save(order);
   }
-
+  async deliveredShipping(req: Request, id: number) {
+    const token = this.getDecodedToken(req);
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: {
+        carrier: {
+          user: true,
+        },
+        shipper: {
+          user: true,
+        },
+      },
+    });
+    if (order?.carrier.user.id !== token.id) {
+      throw new BadRequestException('Forbidden resource');
+    }
+    if (!order) {
+      throw new BadRequestException("Order doesn't exist");
+    }
+    if (order.status !== OrderStatus.on_way) {
+      throw new BadRequestException('Order is not accepted');
+    }
+    order.status = OrderStatus.delivered;
+    return this.orderRepo.save(order);
+  }
   /**
    * Starts shipping accepted order
    * @param req request to get token
@@ -147,29 +171,28 @@ export class OrdersService {
    */
   async startShipping(req: Request, id: number): Promise<OrderEntity> {
     const token = this.getDecodedToken(req);
-    let order: OrderEntity = await this.redisService.get(
-      `orders:ordersService:order:${id}`,
-    );
-    if (order?.carrier.id !== token.id) {
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: {
+        carrier: {
+          user: true,
+        },
+        shipper: {
+          user: true,
+        },
+      },
+    });
+    if (order?.carrier.user.id !== token.id) {
       throw new BadRequestException('Forbidden resource');
     }
     if (!order) {
-      order = await this.orderRepo.findOne({ where: { id } });
-      if (!order) {
-        throw new BadRequestException("Order doesn't exist");
-      }
+      throw new BadRequestException("Order doesn't exist");
     }
     if (order.status !== OrderStatus.accepted) {
       throw new BadRequestException('Order is not accepted');
     }
     order.status = OrderStatus.on_way;
-    return this.orderRepo.save(order).then(async (savedOrder) => {
-      await this.redisService.set(
-        `orders:ordersService:order:${id}`,
-        savedOrder,
-      );
-      return savedOrder;
-    });
+    return this.orderRepo.save(order);
   }
 
   /**
@@ -178,7 +201,11 @@ export class OrdersService {
    * @param id id of order to finish
    * @returns {Promise<Order>} promise to return updated order
    */
-  async finishShipping(req: Request, id: number): Promise<OrderEntity> {
+  async finishShipping(
+    req: Request,
+    id: number,
+    file: Express.Multer.File,
+  ): Promise<OrderEntity> {
     const token = this.getDecodedToken(req);
     let order: OrderEntity = await this.redisService.get(
       `orders:ordersService:order:${id}`,
@@ -195,14 +222,14 @@ export class OrdersService {
     if (order.status !== OrderStatus.on_way) {
       throw new BadRequestException('Order is not on way');
     }
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    const bucketKey = `${file.fieldname}${Date.now()}`;
+    const fileUrl = await this.s3Service.uploadFile(file, bucketKey);
     order.status = OrderStatus.finished;
-    return this.orderRepo.save(order).then(async (savedOrder) => {
-      await this.redisService.set(
-        `orders:ordersService:order:${id}`,
-        savedOrder,
-      );
-      return savedOrder;
-    });
+    order.acceptance_image = fileUrl;
+    return this.orderRepo.save(order);
   }
 
   /**
