@@ -15,7 +15,8 @@ import { AddEmployeeDto } from 'src/companies/dto/add-employee.dto';
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { OperatorEntity } from './entities/operator.entity';
 import { RolesEnum } from './enums/roles.enum';
-
+import { MailService } from '../mail/mail.service';
+const { v4: uuidv4 } = require('uuid');
 @Injectable()
 export class UsersService {
   constructor(
@@ -29,6 +30,7 @@ export class UsersService {
     private readonly operatorRepository: Repository<OperatorEntity>,
     private readonly redisService: RedisService,
     private readonly companiesService: CompaniesService,
+    private readonly mailService: MailService,
   ) {}
 
   async createOperator(dto: CreateOperatorDto): Promise<OperatorEntity> {
@@ -90,6 +92,55 @@ export class UsersService {
     delete registeredCarrier.user.password;
     return registeredCarrier;
   }
+  async resetPassword(id, password) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.resetPasswordToken = null;
+    await this.userRepository.save(user);
+    return { message: 'Password changed' };
+  }
+  async checkPassword(email, resetPassword) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const isMatch = await bcrypt.compare(
+      resetPassword,
+      user.resetPasswordToken,
+    );
+    if (!isMatch) {
+      throw new BadRequestException('Invalid code');
+    }
+    return { id: user.id };
+  }
+  async recoverPassword({ email }) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const uuid = uuidv4();
+    const code = uuid.replace(/-/g, '').substring(0, 4);
+    await this.mailService.sendMail(
+      email,
+      'recover password',
+      `
+           <h1>Ваш 4-значный код:</h1>
+      <p>${code}</p>
+      <p>Сохраните этот код в надежном месте.</p>
+        `,
+    );
+    const salt = await bcrypt.genSalt(10);
+    user.resetPasswordToken = await bcrypt.hash(code, salt);
+    await this.userRepository.save(user);
+    return { message: 'Code sent' };
+  }
+
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const registeredUser = await this.userRepository.findOne({
       where: [{ phone: dto.phone }, { email: dto.email }],
@@ -178,6 +229,7 @@ export class UsersService {
     delete user.password;
     const carrier = await this.carrierRepository.findOne({
       where: { user: { id } },
+      relations: { user: true },
     });
     if (!carrier) {
       throw new BadRequestException('Carrier not found');
