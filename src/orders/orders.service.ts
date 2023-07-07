@@ -79,7 +79,11 @@ export class OrdersService {
     price += +data.weight * CONFIG.priceSystem.weightFactorPerPound;
     return price;
   }
-
+  async payOrder(req, orderId: number) {
+    const order = await this.orderRepo.findOne({ where: { id: orderId } });
+    order.status = OrderStatus.waiting;
+    return this.orderRepo.save(order);
+  }
   /**
    * Creates new order
    * @param {Request} req request to get token
@@ -371,13 +375,11 @@ export class OrdersService {
    * @returns {Promise<OrderEntity>} order
    */
   async getOrderById(id: number): Promise<OrderEntity> {
-    const order: OrderEntity = await this.redisService.get(
-      `orders:ordersService:order:${id}`,
-    );
-    if (order) {
-      return order;
+    const order: OrderEntity = await this.orderRepo.findOne({ where: { id } });
+    if(!order) {
+      throw new BadRequestException("Order doesn't exist");
     }
-    return this.orderRepo.findOne({ where: { id } });
+    return order;
   }
 
   /**
