@@ -13,4 +13,6 @@ export class PaymentDto {
   price: number;
   @ApiProperty()
   cancel_url: string;
+  @ApiProperty()
+  success_url: string;
 }
