@@ -8,7 +8,7 @@ export class StripeService {
   async createCheckoutSession(data: PaymentDto) {
     try {
       if (data) {
-        if(data.price <= 0 ){
+        if (data.price <= 0) {
           data.price = 1;
         }
         const session = await stripe.checkout.sessions.create({
@@ -27,7 +27,7 @@ export class StripeService {
               quantity: 1,
             },
           ],
-          success_url: `http://localhost:3000/orders/paid/${data.id}`, // TODO: change to success url
+          success_url: `http://localhost:3000/orders/pay-order/${data.id}`,
           cancel_url: `${data.cancel_url}`,
           locale: 'en',
         });
