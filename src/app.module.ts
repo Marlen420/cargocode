@@ -17,6 +17,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { SocketGateway } from './socket/socket.gateway';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { MessagesModule } from './messages/messages.module';
+import { MailModule } from './mail/mail.module';
 
 config();
 @Module({
@@ -47,6 +48,7 @@ config();
     StripeModule,
     AwsS3Module,
     MessagesModule,
+    MailModule,
   ],
   controllers: [StripeController],
   providers: [

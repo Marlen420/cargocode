@@ -5,27 +5,30 @@ const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 
 @Injectable()
 export class StripeService {
-  async createCheckoutSession(data: PaymentDto[]) {
+  async createCheckoutSession(data: PaymentDto) {
     try {
-      if (data && data.length > 0) {
+      if (data) {
+        if(data.price <= 0 ){
+          data.price = 1;
+        }
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
           mode: 'payment',
-          line_items: data.map((item) => {
-            return {
+          line_items: [
+            {
               price_data: {
                 currency: 'usd',
                 product_data: {
-                  name: `${item.from} - ${item.to} -> ${item.distance}`,
-                  description: `${item.deliveryType}`,
+                  name: `${data.from} - ${data.to}`,
+                  description: `${data.deliveryType}`,
                 },
-                unit_amount: item.price * 100,
+                unit_amount: data.price * 100,
               },
               quantity: 1,
-            };
-          }),
-          success_url: `https://www.google.com/success`, // TODO: change to success url
-          cancel_url: `https://www.google.com/cancel`,
+            },
+          ],
+          success_url: `http://localhost:3000/orders/paid/${data.id}`, // TODO: change to success url
+          cancel_url: `${data.cancel_url}`,
           locale: 'en',
         });
         return {

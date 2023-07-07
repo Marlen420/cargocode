@@ -20,6 +20,7 @@ import { AwsS3Module } from '../aws-s3/aws-s3.module';
 import { TrimbleService } from 'src/trimble/trimble.service';
 import { TrimbleModule } from 'src/trimble/trimble.module';
 import { MessagesModule } from 'src/messages/messages.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { MessagesModule } from 'src/messages/messages.module';
     AwsS3Module,
     TrimbleModule,
     MessagesModule,
+    MailModule,
   ],
   controllers: [OrdersController],
   providers: [

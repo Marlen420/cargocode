@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities/user.entity';
@@ -46,6 +47,46 @@ export class UsersController {
     return this.usersService.createOperator(createOperatorDto);
   }
 
+  @ApiOperation({
+    summary: 'Recover password',
+  })
+  @ApiBody({ schema: { example: { email: 'john@mail.ru' } } })
+  @Post('recover-password')
+  async recoverPassword(@Body() data: any): Promise<any> {
+    return this.usersService.recoverPassword({ email: data.email });
+  }
+  @ApiOperation({
+    summary: 'Check password',
+  })
+  @ApiBody({
+    schema: {
+      example: {
+        email: 'asd@gmail.com',
+        resetPassword: '1234',
+      },
+    },
+  })
+  @Post('check-password')
+  async checkPassword(@Body() data: any): Promise<any> {
+    const { email, resetPassword } = data;
+    return this.usersService.checkPassword(email, resetPassword);
+  }
+  @ApiOperation({
+    summary: 'Reset password',
+  })
+  @ApiBody({
+    schema: {
+      example: {
+        id: '1',
+        password: '1234',
+      },
+    },
+  })
+  @Put('reset-password')
+  async resetPassword(@Body() data: any): Promise<any> {
+    const { id, password } = data;
+    return this.usersService.resetPassword(id, password);
+  }
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({ type: CreateCarrierDto })
   @ApiResponse({

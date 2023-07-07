@@ -18,6 +18,8 @@ export class UserEntity {
   email: string;
   @Column()
   password: string;
+  @Column({ nullable: true })
+  resetPasswordToken: string;
   @Column({ enum: RolesEnum })
   role: RolesEnum;
   @OneToOne(() => CarrierEntity, (e) => e.user, { nullable: true })

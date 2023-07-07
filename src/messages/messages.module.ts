@@ -11,6 +11,7 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { MessageEntity } from './entities/message.entity';
 import { MessagesService } from './messages.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MessagesService } from './messages.service';
     CompaniesModule,
     UsersModule,
     RedisModule,
+    MailModule,
   ],
   providers: [MessagesService, UsersService],
   exports: [MessagesService],

@@ -6,9 +6,9 @@ import { PaymentDto } from './dto/payment.dto';
 @Controller('stripe')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
-  @ApiBody({ type: PaymentDto, isArray: true })
+  @ApiBody({ type: PaymentDto })
   @Post('create-checkout-session')
-  createCheckoutSession(@Body() data: PaymentDto[]) {
+  createCheckoutSession(@Body() data: PaymentDto) {
     try {
       return this.stripeService.createCheckoutSession(data);
     } catch (e) {

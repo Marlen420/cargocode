@@ -23,6 +23,7 @@ import { SocketGateway } from 'src/socket/socket.gateway';
 import { S3Service } from '../aws-s3/aws-s3.service';
 import { ValidationError } from 'class-validator';
 import { TrimbleService } from 'src/trimble/trimble.service';
+import { MailService } from '../mail/mail.service';
 
 /**
  * Interface of decoded user bearer token
@@ -42,10 +43,12 @@ export class OrdersService {
    * @param {Redis} redisService redis service
    * @param jwtService jwt service
    * @param mapboxService mapbox service
+   * @param trimbleService
    * @param usersService users servuce
    * @param socketGateway
    * @param orderRepo order entity repository
    * @param s3Service
+   * @param mailService
    */
   constructor(
     private readonly redisService: RedisService,
@@ -57,6 +60,7 @@ export class OrdersService {
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
     private s3Service: S3Service,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -91,7 +95,7 @@ export class OrdersService {
     }
     const order: OrderEntity = new OrderEntity();
     order.shipper = shipper;
-    order.status = OrderStatus.waiting;
+    order.status = OrderStatus.not_paid;
     const location = await this.trimbleService.getLocation(
       data.pickup_location,
       data.destination,
@@ -118,7 +122,14 @@ export class OrdersService {
    */
   async acceptOrder(req: Request, orderId: number): Promise<any> {
     const token = this.getDecodedToken(req);
-    const order = await this.orderRepo.findOne({ where: { id: orderId } });
+    const order = await this.orderRepo.findOne({
+      where: { id: orderId },
+      relations: {
+        shipper: {
+          user: true,
+        },
+      },
+    });
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }
@@ -126,7 +137,6 @@ export class OrdersService {
       token.id,
       { user: false },
     );
-
     if (!carrier) {
       throw new BadRequestException("Couldn't accept the order");
     }
@@ -135,6 +145,26 @@ export class OrdersService {
     }
     order.status = OrderStatus.accepted;
     order.carrier = carrier;
+    await this.mailService.sendMail(
+      'timur.pratovv@gmail.com',
+      'Your accepted order',
+      `
+        <h1>Order accepted</h1>
+        <p>Order id: ${order.id}</p>
+        <p>Shipper: ${order.shipper.user.firstname} ${order.shipper.user.lastname}</p>
+        <p>Carrier: ${carrier.user.firstname} ${carrier.user.lastname}</p>
+        <p>Phone: ${carrier.user.phone}</p>
+        <p>Email: ${carrier.user.email}</p>
+        <p>Price: ${order.price}</p>
+        <p>Weight: ${order.weight}</p>
+        <p>Origin: ${order.pickup_location}</p>
+        <p>Destination: ${order.destination}</p>
+        <p>Origin latitude: ${order.origin_latitude}</p>
+        <p>Origin longitude: ${order.origin_longitude}</p>
+        <p>Destination latitude: ${order.destination_latitude}</p>
+        <p>Destination longitude: ${order.destination_longitude}</p>
+        `,
+    );
     return this.orderRepo.save(order);
   }
   async deliveredShipping(req: Request, id: number) {
@@ -206,20 +236,19 @@ export class OrdersService {
     file: Express.Multer.File,
   ): Promise<OrderEntity> {
     const token = this.getDecodedToken(req);
-    let order: OrderEntity = await this.redisService.get(
-      `orders:ordersService:order:${id}`,
-    );
-    if (order?.carrier.id !== token.id) {
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: {
+        carrier: {
+          user: true,
+        },
+      },
+    });
+    if (order?.carrier.user.id !== token.id) {
       throw new BadRequestException('Forbidden resource');
     }
-    if (!order) {
-      order = await this.orderRepo.findOne({ where: { id } });
-      if (!order) {
-        throw new BadRequestException("Order doesn't exist");
-      }
-    }
-    if (order.status !== OrderStatus.on_way) {
-      throw new BadRequestException('Order is not on way');
+    if (order.status !== OrderStatus.delivered) {
+      throw new BadRequestException('Order is not delivered');
     }
     if (!file) {
       throw new BadRequestException('No file provided');
@@ -324,7 +353,9 @@ export class OrdersService {
         shipper: {
           user: true,
         },
-        carrier: true,
+        carrier: {
+          user: true,
+        },
       },
     });
 

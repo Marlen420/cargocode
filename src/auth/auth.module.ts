@@ -14,6 +14,7 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { AuthController } from './auth.controler';
 import { AuthService } from './auth.service';
+import { MailModule } from '../mail/mail.module';
 config();
 
 @Module({
@@ -28,6 +29,7 @@ config();
     ]),
     RedisModule,
     CompaniesModule,
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UsersService, RedisService, CompaniesService],
