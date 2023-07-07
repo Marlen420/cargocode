@@ -335,7 +335,9 @@ export class OrdersService {
       }
     }
     if (order.status !== OrderStatus.waiting) {
-      throw new BadRequestException("Cannot enable order, it's already accepted");
+      throw new BadRequestException(
+        "Cannot enable order, it's already accepted",
+      );
     }
     order.active = true;
     return this.orderRepo.save(order).then(async (savedOrder) => {

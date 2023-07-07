@@ -32,7 +32,7 @@ export class AuthService {
       }
     }
     const company: CompanyEntity = isEmail
-      ? await this.companiesService.findByEmail(login)
+      ? await this.companiesService.findByEmailForLogin(login)
       : await this.companiesService.findByLogin(login);
     if (company) {
       const passwordValid = await bcrypt.compare(password, company.password);
