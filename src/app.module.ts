@@ -57,7 +57,6 @@ config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    SocketGateway,
   ],
 })
 export class AppModule {}

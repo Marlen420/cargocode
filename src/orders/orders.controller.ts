@@ -46,7 +46,7 @@ export class OrdersController {
     return this.ordersService.priceEstimate(data);
   }
 
-  @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
+  // @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all orders' })
   @Get()
@@ -154,12 +154,5 @@ export class OrdersController {
     @Param('id') id: string,
   ): Promise<OrderEntity> {
     return this.ordersService.disableOrder(req, +id);
-  }
-
-  @ApiOperation({ summary: 'Send message to client through web socket' })
-  @ApiBody({})
-  @Post('send-message')
-  async sendMessage(@Body() data: any) {
-    return this.ordersService.sendMessage(data);
   }
 }

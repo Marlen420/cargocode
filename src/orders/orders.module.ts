@@ -48,7 +48,6 @@ import { MailModule } from '../mail/mail.module';
     OrdersService,
     MapboxService,
     UsersService,
-    SocketGateway,
     TrimbleService,
   ],
 })

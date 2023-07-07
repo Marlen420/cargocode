@@ -1,5 +1,4 @@
 import {
-  BadGatewayException,
   BadRequestException,
   ForbiddenException,
   Injectable,
@@ -287,7 +286,7 @@ export class OrdersService {
       }
     }
     if (order.status !== OrderStatus.waiting) {
-      throw new BadGatewayException(
+      throw new BadRequestException(
         "Cannot disable order, it's already accepted",
       );
     }
@@ -336,9 +335,7 @@ export class OrdersService {
       }
     }
     if (order.status !== OrderStatus.waiting) {
-      throw new BadGatewayException(
-        "Cannot enable order, it's already accepted",
-      );
+      throw new BadRequestException("Cannot enable order, it's already accepted");
     }
     order.active = true;
     return this.orderRepo.save(order).then(async (savedOrder) => {
@@ -403,11 +400,6 @@ export class OrdersService {
       user: false,
     });
     return this.orderRepo.find({ where: { shipper: { id: shipper.id } } });
-  }
-
-  async sendMessage(message: any) {
-    console.log('Service');
-    return await this.socketGateway.sendOrder(message);
   }
 
   private getDecodedToken(req: Request): UserToken {
