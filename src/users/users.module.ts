@@ -13,6 +13,7 @@ import { CompanyEntity } from 'src/companies/entities/company.entity';
 import { OperatorEntity } from './entities/operator.entity';
 import { MessagesModule } from 'src/messages/messages.module';
 import { MessageEntity } from 'src/messages/entities/message.entity';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MessageEntity } from 'src/messages/entities/message.entity';
     ]),
     RedisModule,
     CompaniesModule,
+    MailModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, RedisService, CompaniesService],
