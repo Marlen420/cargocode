@@ -46,7 +46,7 @@ export class OrdersController {
     return this.ordersService.priceEstimate(data);
   }
 
-  @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
+  // @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all orders' })
   @Get()
