@@ -27,7 +27,7 @@ export class StripeService {
               quantity: 1,
             },
           ],
-          success_url: `http://localhost:3000/orders/pay-order/${data.id}`,
+          success_url: `${data.success_url}`,
           cancel_url: `${data.cancel_url}`,
           locale: 'en',
         });

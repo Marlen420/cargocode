@@ -376,7 +376,7 @@ export class OrdersService {
    */
   async getOrderById(id: number): Promise<OrderEntity> {
     const order: OrderEntity = await this.orderRepo.findOne({ where: { id } });
-    if(!order) {
+    if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }
     return order;
