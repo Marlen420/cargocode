@@ -150,11 +150,4 @@ export class OrdersController {
   ): Promise<OrderEntity> {
     return this.ordersService.disableOrder(req, +id);
   }
-
-  @ApiOperation({ summary: 'Send message to client through web socket' })
-  @ApiBody({})
-  @Post('send-message')
-  async sendMessage(@Body() data: any) {
-    return this.ordersService.sendMessage(data);
-  }
 }

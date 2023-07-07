@@ -26,6 +26,7 @@ export class MessagesService {
   async createMessage(data: CreateMessageDto): Promise<MessageEntity> {
     const message = new MessageEntity();
     const user = await this.userService.findOne(data.authorId);
+    message.order_id = data.orderId;
     if (!user) {
       throw new BadRequestException('User not found');
     }

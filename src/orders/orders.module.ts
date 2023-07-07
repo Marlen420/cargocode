@@ -46,7 +46,6 @@ import { MessagesModule } from 'src/messages/messages.module';
     OrdersService,
     MapboxService,
     UsersService,
-    SocketGateway,
     TrimbleService,
   ],
 })
