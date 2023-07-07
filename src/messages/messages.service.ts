@@ -17,7 +17,7 @@ export class MessagesService {
    * Finds messages by room id (id of order is room id)
    */
   async findMessageByRoom(id: number): Promise<MessageEntity[]> {
-    return this.messageRepo.find({ where: { id } });
+    return this.messageRepo.find({ where: { order_id: id } });
   }
 
   /**
