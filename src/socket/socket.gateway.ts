@@ -41,12 +41,18 @@ export class SocketGateway {
   @SubscribeMessage('orders:get-room-messages')
   async getRoomMessages(client, { orderId }) {
     const messages = await this.messagesService.findMessageByRoom(orderId);
-    this.server.to(client.id).emit('orders:receive-room-messages', {data: messages, orderId});
+    this.server
+      .to(client.id)
+      .emit('orders:receive-room-messages', { data: messages, orderId });
   }
 
   @SubscribeMessage('orders:send-message')
   async sendMessage(client, data: SendMessageDto) {
-    const message = await this.messagesService.createMessage({orderId: data.orderId, authorId: data.authorId, text: data.text});
+    const message = await this.messagesService.createMessage({
+      orderId: data.orderId,
+      authorId: data.authorId,
+      text: data.text,
+    });
     this.server.to(client.id).emit('orders:receive-message', message);
   }
 }

@@ -19,7 +19,7 @@ export class MessageEntity {
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
   created_at: Date;
-  @ManyToOne(() => UserEntity, { eager: true})
+  @ManyToOne(() => UserEntity, { eager: true })
   author: UserEntity;
   @Column()
   order_id: number;
