@@ -18,7 +18,7 @@ export class PriceEstimateDto {
   @IsDateString()
   delivery_date: Date;
 
-  @ApiProperty({ example: 88000 })
+  @ApiProperty({ example: '88000' })
   @IsString()
   weight: string;
 

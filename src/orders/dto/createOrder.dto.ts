@@ -18,7 +18,7 @@ export class CreateOrderDto {
   @IsDateString()
   delivery_date: Date;
 
-  @ApiProperty({ example: 88000 })
+  @ApiProperty({ example: '88000' })
   @IsString()
   weight: string;
 
@@ -31,7 +31,4 @@ export class CreateOrderDto {
 
   @ApiProperty({ nullable: true })
   special_instructions: string | null | undefined;
-
-  @ApiProperty({ nullable: false })
-  price: number;
 }
