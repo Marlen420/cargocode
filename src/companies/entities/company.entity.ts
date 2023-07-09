@@ -16,8 +16,6 @@ export class CompanyEntity {
   @Column()
   address: string;
   @Column({ unique: true, nullable: true })
-  login: string;
-  @Column({ unique: true, nullable: true })
   email: string;
   @Column()
   password: string;

@@ -47,9 +47,6 @@ export class CompaniesService {
     return company;
   }
 
-  async findByEmailForLogin(email: string) {
-    return await this.companyRepository.findOne({ where: { email } });
-  }
   /**
    * Finds company by provided email
    */
@@ -62,30 +59,10 @@ export class CompaniesService {
   }
 
   /**
-   * Finds company by provided login
-   */
-  async findByLogin(login: string): Promise<CompanyEntity> {
-    const company = await this.companyRepository.findOne({ where: { login } });
-    if (!company) {
-      throw new BadRequestException('Company not found');
-    }
-    return company;
-  }
-  async findByLoginByEmail(login: string): Promise<CompanyEntity> {
-    return await this.companyRepository.findOne({ where: { login } });
-  }
-
-  /**
    * Creates new company
    */
   async createCompany(data: CreateCompanyDto): Promise<CompanyEntity> {
-    let company: CompanyEntity = await this.companyRepository.findOne({
-      where: { login: data.login },
-    });
-    if (company) {
-      throw new BadRequestException('This login already taken');
-    }
-    company = await this.companyRepository.findOne({
+    const company = await this.companyRepository.findOne({
       where: { email: data.email },
     });
     if (company) {

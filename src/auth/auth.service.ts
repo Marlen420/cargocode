@@ -31,9 +31,7 @@ export class AuthService {
         return { access_token: this.jwtService.sign({ ...user }) };
       }
     }
-    const company: CompanyEntity = isEmail
-      ? await this.companiesService.findByEmailForLogin(login)
-      : await this.companiesService.findByLogin(login);
+    const company: CompanyEntity = await this.companiesService.findByEmail(data.login);
     if (company) {
       const passwordValid = await bcrypt.compare(password, company.password);
       if (passwordValid) {

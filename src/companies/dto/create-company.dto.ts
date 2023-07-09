@@ -16,10 +16,6 @@ export class CreateCompanyDto {
 
   @ApiProperty()
   @IsString()
-  login: string;
-
-  @ApiProperty()
-  @IsString()
   email: string;
 
   @ApiProperty()
