@@ -82,7 +82,6 @@ export class OrdersController {
   @ApiOperation({ summary: 'Accept order' })
   @Put('accept-order/:orderId')
   async acceptOrder(@Req() req: Request, @Param('orderId') orderId: number) {
-    console.log(orderId);
     return this.ordersService.acceptOrder(req, orderId);
   }
 

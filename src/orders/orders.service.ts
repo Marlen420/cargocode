@@ -137,7 +137,6 @@ export class OrdersService {
    */
   async acceptOrder(req: Request, orderId: number): Promise<any> {
     const token = this.getDecodedToken(req);
-    console.log(orderId,'orderID');
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
       relations: {
@@ -146,7 +145,6 @@ export class OrdersService {
         },
       },
     });
-    console.log(order,'ORDER INFO');
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }
@@ -163,7 +161,7 @@ export class OrdersService {
     order.status = OrderStatus.accepted;
     order.carrier = carrier;
     await this.mailService.sendMail(
-      `${order.shipper.user.email}`,
+      `${carrier.user.email}`,
       'Your accepted order',
       `<h1>Order accepted</h1>
             <p><strong>Order id:</strong> ${order.id}</p>
@@ -204,11 +202,11 @@ export class OrdersService {
         },
       },
     });
-    if (order?.carrier.user.id !== token.id) {
-      throw new BadRequestException('Forbidden resource');
-    }
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
+    }
+    if (order?.carrier.user.id !== token.id) {
+      throw new BadRequestException('Forbidden resource');
     }
     if (order.status !== OrderStatus.on_way) {
       throw new BadRequestException('Order is not accepted');
@@ -235,11 +233,11 @@ export class OrdersService {
         },
       },
     });
-    if (order?.carrier.user.id !== token.id) {
-      throw new BadRequestException('Forbidden resource');
-    }
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
+    }
+    if (order?.carrier.user.id !== token.id) {
+      throw new BadRequestException('Forbidden resource');
     }
     if (order.status !== OrderStatus.accepted) {
       throw new BadRequestException('Order is not accepted');
