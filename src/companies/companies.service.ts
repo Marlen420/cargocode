@@ -51,11 +51,7 @@ export class CompaniesService {
    * Finds company by provided email
    */
   async findByEmail(email: string): Promise<CompanyEntity> {
-    const company = await this.companyRepository.findOne({ where: { email } });
-    if (!company) {
-      throw new BadRequestException('Company not found');
-    }
-    return company;
+    return this.companyRepository.findOne({ where: { email } });
   }
 
   /**
