@@ -179,9 +179,14 @@ export class UsersService {
       where: { phone },
     });
   }
-  async findShipperById(id: number) {
-    const shipper = await this.shipperRepository.findOne({ where: { id } });
-    if (!shipper) throw new BadRequestException();
+  async findShipperByUserId(id: number) {
+    console.log(id);
+    const shipper = await this.shipperRepository.findOne({
+      where: { user: { id } },
+    });
+    if (!shipper) {
+      throw new BadRequestException('Shipper is not found');
+    }
     return shipper;
   }
   async findCarrierById(id: number) {

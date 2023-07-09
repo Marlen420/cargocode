@@ -79,13 +79,14 @@ export class StripeService {
    * @returns {Promise<PaymentEntity>} Promise containing the created payment entity
    */
   async createPaymentDto(data: PaymentLocalDto): Promise<PaymentEntity> {
-    const shipper: ShipperEntity = await this.usersService.findShipperById(
-      data.carrierId,
+    const shipper: ShipperEntity = await this.usersService.findShipperByUserId(
+      data.shipperId,
     );
     const order = await this.ordersService.findOne(data.orderId);
     const payment = new PaymentEntity();
     payment.shipper = shipper;
     payment.order = order;
+    payment.total = data.total;
     payment.date = new Date();
     await this.ordersService.orderToWaitStatusById(data.orderId);
     return await this.paymentRepo.save(payment);

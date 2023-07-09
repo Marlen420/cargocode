@@ -137,6 +137,7 @@ export class OrdersService {
    */
   async acceptOrder(req: Request, orderId: number): Promise<any> {
     const token = this.getDecodedToken(req);
+    console.log(orderId,'orderID');
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
       relations: {
@@ -145,6 +146,7 @@ export class OrdersService {
         },
       },
     });
+    console.log(order,'ORDER INFO');
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }
@@ -161,24 +163,23 @@ export class OrdersService {
     order.status = OrderStatus.accepted;
     order.carrier = carrier;
     await this.mailService.sendMail(
-      'timur.pratovv@gmail.com',
+      `${order.shipper.user.email}`,
       'Your accepted order',
-      `
-        <h1>Order accepted</h1>
-        <p>Order id: ${order.id}</p>
-        <p>Shipper: ${order.shipper.user.firstname} ${order.shipper.user.lastname}</p>
-        <p>Carrier: ${carrier.user.firstname} ${carrier.user.lastname}</p>
-        <p>Phone: ${carrier.user.phone}</p>
-        <p>Email: ${carrier.user.email}</p>
-        <p>Price: ${order.price}</p>
-        <p>Weight: ${order.weight}</p>
-        <p>Origin: ${order.pickup_location}</p>
-        <p>Destination: ${order.destination}</p>
-        <p>Origin latitude: ${order.pickup_latitude}</p>
-        <p>Origin longitude: ${order.pickup_longitude}</p>
-        <p>Destination latitude: ${order.destination_latitude}</p>
-        <p>Destination longitude: ${order.destination_longitude}</p>
-        `,
+      `<h1>Order accepted</h1>
+            <p><strong>Order id:</strong> ${order.id}</p>
+            <p><strong>Shipper:</strong> ${order.shipper.user.firstname} ${order.shipper.user.lastname}</p>
+            <p><strong>Carrier:</strong> ${carrier.user.firstname} ${carrier.user.lastname}</p>
+            <p><strong>Phone:</strong> ${carrier.user.phone}</p>
+            <p><strong>Email:</strong> ${carrier.user.email}</p>
+            <p><strong>Price:</strong> ${order.price}</p>
+            <p><strong>Weight:</strong> ${order.weight}</p>
+            <p><strong>Origin:</strong> ${order.pickup_location}</p>
+            <p><strong>Destination:</strong> ${order.destination}</p>
+            <p><strong>Origin latitude:</strong> ${order.pickup_latitude}</p>
+            <p><strong>Origin longitude:</strong> ${order.pickup_longitude}</p>
+            <p><strong>Destination latitude:</strong> ${order.destination_latitude}</p>
+            <p><strong>Destination longitude:</strong> ${order.destination_longitude}</p>
+       `,
     );
     return this.orderRepo.save(order);
   }
