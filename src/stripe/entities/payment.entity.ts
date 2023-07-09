@@ -1,6 +1,7 @@
 import { Column, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderEntity } from '../../orders/entities/order.entity';
 import { CarrierEntity } from '../../users/entities/carrier.entity';
+import { ShipperEntity } from '../../users/entities/shipper.entity';
 
 export class PaymentEntity {
   @PrimaryGeneratedColumn()
@@ -12,6 +13,10 @@ export class PaymentEntity {
   @OneToOne(() => OrderEntity)
   @JoinColumn()
   order: OrderEntity;
-  @OneToOne(() => CarrierEntity)
+  @OneToOne(() => CarrierEntity, { nullable: true })
+  @JoinColumn()
   carrier: CarrierEntity;
+  @OneToOne(() => ShipperEntity)
+  @JoinColumn()
+  shipper: ShipperEntity;
 }

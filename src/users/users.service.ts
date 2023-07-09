@@ -179,7 +179,20 @@ export class UsersService {
       where: { phone },
     });
   }
-
+  async findShipperById(id: number) {
+    const shipper = await this.shipperRepository.findOne({ where: { id } });
+    if (!shipper) throw new BadRequestException();
+    return shipper;
+  }
+  async findCarrierById(id: number) {
+    const carrier = await this.carrierRepository.findOne({
+      where: { id },
+    });
+    if (!carrier) {
+      throw new BadRequestException(`User with id is not found ${id}`);
+    }
+    return carrier;
+  }
   async findOne(id: number): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       select: ['id', 'firstname', 'lastname', 'phone', 'email', 'role'],

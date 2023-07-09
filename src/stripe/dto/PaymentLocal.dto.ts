@@ -7,4 +7,6 @@ export class PaymentLocalDto {
   orderId: number;
   @ApiProperty()
   carrierId: number;
+  @ApiProperty()
+  shipperId: number;
 }
