@@ -23,11 +23,6 @@ export class CreateCarrierDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({
-    enum: RolesEnum,
-    isArray: false,
-    example: RolesEnum.CARRIER,
-  })
   role: RolesEnum;
 
   @ApiProperty()

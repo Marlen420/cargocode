@@ -348,6 +348,13 @@ export class OrdersService {
       return savedOrder;
     });
   }
+  async findOne(id: number) {
+    const order = await this.orderRepo.findOne({ where: { id } });
+    if (!order) {
+      throw new BadRequestException('Order is not found');
+    }
+    return order;
+  }
 
   /**
    * Returns array of orders

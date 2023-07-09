@@ -1,7 +1,8 @@
 import { Body, Controller, Post, Redirect, Req, Res } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StripeService } from './stripe.service';
 import { PaymentDto } from './dto/payment.dto';
+import { PaymentLocalDto } from './dto/PaymentLocal.dto';
 @ApiTags('Stripe')
 @Controller('stripe')
 export class StripeController {
@@ -14,5 +15,10 @@ export class StripeController {
     } catch (e) {
       return { error: e.message };
     }
+  }
+  @ApiOperation({ summary: 'Произвести оплату в базе данных' })
+  @Post('create/payment')
+  createPayment(@Body() data: PaymentLocalDto) {
+    return this.stripeService.createPaymentDto(data);
   }
 }

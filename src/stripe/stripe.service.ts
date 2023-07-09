@@ -1,10 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaymentDto } from './dto/payment.dto';
+import { PaymentLocalDto } from './dto/PaymentLocal.dto';
+import { UsersService } from '../users/users.service';
+import { OrdersService } from '../orders/orders.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OrderEntity } from '../orders/entities/order.entity';
+import { Repository } from 'typeorm';
+import { PaymentEntity } from './entities/payment.entity';
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 
 @Injectable()
 export class StripeService {
+  constructor(
+    @InjectRepository(PaymentEntity)
+    private readonly paymentRepo: Repository<PaymentEntity>,
+
+    private usersService: UsersService,
+    private ordersService: OrdersService,
+  ) {}
   async createCheckoutSession(data: PaymentDto) {
     try {
       if (data) {
@@ -43,5 +57,10 @@ export class StripeService {
         error: e.message,
       };
     }
+  }
+  async createPaymentDto(data: PaymentLocalDto) {
+    const carrier = await this.usersService.findOne(data.carrierId);
+    const orderId = await this.ordersService.findOne(data.orderId);
+    return await this;
   }
 }
