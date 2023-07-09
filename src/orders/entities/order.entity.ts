@@ -1,11 +1,11 @@
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { ShipperEntity } from 'src/users/entities/shipper.entity';
-import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Currency } from '../enums/currency.enum';

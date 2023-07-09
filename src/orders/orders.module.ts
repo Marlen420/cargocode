@@ -50,5 +50,6 @@ import { MailModule } from '../mail/mail.module';
     UsersService,
     TrimbleService,
   ],
+  exports: [OrdersService],
 })
 export class OrdersModule {}

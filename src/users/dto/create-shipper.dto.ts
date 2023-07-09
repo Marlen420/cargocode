@@ -22,11 +22,6 @@ export class CreateShipperDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({
-    enum: RolesEnum,
-    isArray: false,
-    example: RolesEnum.SHIPPER,
-  })
   role: RolesEnum;
 
   @ApiProperty()
