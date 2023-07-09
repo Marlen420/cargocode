@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { RolesEnum } from 'src/users/enums/roles.enum';
 import { ROLES_KEY } from '../decorators/role.decorator';
-
+require('dotenv').config()
 interface UserToken {
   role: RolesEnum;
   [key: string]: any;
@@ -31,12 +31,15 @@ export class RolesGuard implements CanActivate {
     }
     try {
       const { headers }: Request = context.switchToHttp().getRequest();
+      console.log('Req Headers: ', headers);
       const token: string = headers.authorization.split(' ')[1];
-      const decodedToken = this.jwtService.verify(token) as UserToken;
+      console.log(token);
+      const decodedToken = this.jwtService.verify(token,{secret:process.env.JWT_SECRET}) as UserToken;
       return requiredRoles.some(
         (role) => role === 'ALL' || role === decodedToken.role,
       );
     } catch (err) {
+      console.log('Error: ', err)
       throw new UnauthorizedException();
     }
   }

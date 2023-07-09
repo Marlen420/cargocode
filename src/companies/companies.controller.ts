@@ -8,7 +8,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -19,6 +19,7 @@ import { AddEmployeeDto } from './dto/add-employee.dto';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { CompanyEntity } from './entities/company.entity';
 
+@ApiBearerAuth()
 @ApiTags('Companies')
 @Controller('companies')
 export class CompaniesController {

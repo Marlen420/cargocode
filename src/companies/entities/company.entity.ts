@@ -16,10 +16,12 @@ export class CompanyEntity {
   @Column()
   address: string;
   @Column({ unique: true, nullable: true })
+  login: string;
+  @Column({ unique: true, nullable: true })
   email: string;
   @Column()
   password: string;
-  @Column({ array: true, type: 'json', default: [] })
+  @Column('jsonb', {nullable: true})
   employees_credential: AddEmployeeDto[];
   @OneToMany(() => CarrierEntity, (carrier) => carrier.company, { eager: true })
   carriers: CarrierEntity[];
