@@ -9,8 +9,12 @@ export class PaymentDto {
   deliveryType: string;
   @ApiProperty()
   price: number;
-  @ApiProperty()
+  @ApiProperty({
+    example: 'https://pornhub.com',
+  })
   cancel_url: string;
-  @ApiProperty()
+  @ApiProperty({
+    example: 'https://pornhub.com',
+  })
   success_url: string;
 }
