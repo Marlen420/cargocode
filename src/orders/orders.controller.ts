@@ -77,16 +77,10 @@ export class OrdersController {
   async createOrder(@Req() req: Request, @Body() data: CreateOrderDto) {
     return this.ordersService.createOrder(req, data);
   }
-
-  @ApiOperation({ summary: 'Pay order' })
-  @Get('pay-order/:orderId')
-  async payOrder(@Req() req: Request, @Param('orderId') orderId: number) {
-    return this.ordersService.payOrder(req, orderId);
-  }
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Accept order' })
-  @Put('accept-order')
+  @Put('accept-order/:orderId')
   async acceptOrder(@Req() req: Request, @Param('orderId') orderId: number) {
     return this.ordersService.acceptOrder(req, orderId);
   }
@@ -94,14 +88,14 @@ export class OrdersController {
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Start shipping accepted order' })
-  @Put('start-shipping')
+  @Put('start-shipping/:orderId')
   async startShipping(@Req() req: Request, @Param('orderId') orderId: number) {
     return this.ordersService.startShipping(req, orderId);
   }
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Start shipping accepted order' })
-  @Put('delivered-shipping')
+  @Put('delivered-shipping/:orderId')
   async deliveredShipping(
     @Req() req: Request,
     @Param('orderId') orderId: number,
@@ -125,7 +119,7 @@ export class OrdersController {
   })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  @Put('finish-shipping')
+  @Put('finish-shipping/:orderId')
   async finishShipping(
     @Req() req: Request,
     @Param('orderId') orderId: number,

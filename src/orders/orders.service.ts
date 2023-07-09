@@ -23,6 +23,7 @@ import { SocketGateway } from 'src/socket/socket.gateway';
 import { S3Service } from '../aws-s3/aws-s3.service';
 import { TrimbleService } from 'src/trimble/trimble.service';
 import { MailService } from '../mail/mail.service';
+import { PaymentEntity } from '../stripe/entities/payment.entity';
 
 /**
  * Interface of decoded user bearer token
@@ -46,6 +47,8 @@ export class OrdersService {
    * @param usersService users servuce
    * @param socketGateway
    * @param orderRepo order entity repository
+   * @param paymentRepo
+   * @param carrierRepo
    * @param s3Service
    * @param mailService
    */
@@ -58,6 +61,10 @@ export class OrdersService {
     private readonly socketGateway: SocketGateway,
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
+    @InjectRepository(PaymentEntity)
+    private readonly paymentRepo: Repository<PaymentEntity>,
+    @InjectRepository(CarrierEntity)
+    private readonly carrierRepo: Repository<CarrierEntity>,
     private s3Service: S3Service,
     private readonly mailService: MailService,
   ) {}
@@ -76,11 +83,6 @@ export class OrdersService {
     let price = distance * CONFIG.priceSystem.baseRatePerMile;
     price += +data.weight * CONFIG.priceSystem.weightFactorPerPound;
     return price;
-  }
-  async payOrder(req, orderId: number) {
-    const order = await this.orderRepo.findOne({ where: { id: orderId } });
-    order.status = OrderStatus.waiting;
-    return this.orderRepo.save(order);
   }
   /**
    * Creates new order
@@ -159,26 +161,33 @@ export class OrdersService {
     order.status = OrderStatus.accepted;
     order.carrier = carrier;
     await this.mailService.sendMail(
-      'timur.pratovv@gmail.com',
+      `${carrier.user.email}`,
       'Your accepted order',
-      `
-        <h1>Order accepted</h1>
-        <p>Order id: ${order.id}</p>
-        <p>Shipper: ${order.shipper.user.firstname} ${order.shipper.user.lastname}</p>
-        <p>Carrier: ${carrier.user.firstname} ${carrier.user.lastname}</p>
-        <p>Phone: ${carrier.user.phone}</p>
-        <p>Email: ${carrier.user.email}</p>
-        <p>Price: ${order.price}</p>
-        <p>Weight: ${order.weight}</p>
-        <p>Origin: ${order.pickup_location}</p>
-        <p>Destination: ${order.destination}</p>
-        <p>Origin latitude: ${order.pickup_latitude}</p>
-        <p>Origin longitude: ${order.pickup_longitude}</p>
-        <p>Destination latitude: ${order.destination_latitude}</p>
-        <p>Destination longitude: ${order.destination_longitude}</p>
-        `,
+      `<h1>Order accepted</h1>
+            <p><strong>Order id:</strong> ${order.id}</p>
+            <p><strong>Shipper:</strong> ${order.shipper.user.firstname} ${order.shipper.user.lastname}</p>
+            <p><strong>Carrier:</strong> ${carrier.user.firstname} ${carrier.user.lastname}</p>
+            <p><strong>Phone:</strong> ${carrier.user.phone}</p>
+            <p><strong>Email:</strong> ${carrier.user.email}</p>
+            <p><strong>Price:</strong> ${order.price}</p>
+            <p><strong>Weight:</strong> ${order.weight}</p>
+            <p><strong>Origin:</strong> ${order.pickup_location}</p>
+            <p><strong>Destination:</strong> ${order.destination}</p>
+            <p><strong>Origin latitude:</strong> ${order.pickup_latitude}</p>
+            <p><strong>Origin longitude:</strong> ${order.pickup_longitude}</p>
+            <p><strong>Destination latitude:</strong> ${order.destination_latitude}</p>
+            <p><strong>Destination longitude:</strong> ${order.destination_longitude}</p>
+       `,
     );
     return this.orderRepo.save(order);
+  }
+  async orderToWaitStatusById(id: number) {
+    const order = await this.orderRepo.findOne({ where: { id } });
+    if (!order) {
+      throw new BadRequestException('Order not found');
+    }
+    order.status = OrderStatus.waiting;
+    return await this.orderRepo.save(order);
   }
   async deliveredShipping(req: Request, id: number) {
     const token = this.getDecodedToken(req);
@@ -193,11 +202,11 @@ export class OrdersService {
         },
       },
     });
-    if (order?.carrier.user.id !== token.id) {
-      throw new BadRequestException('Forbidden resource');
-    }
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
+    }
+    if (order?.carrier.user.id !== token.id) {
+      throw new BadRequestException('Forbidden resource');
     }
     if (order.status !== OrderStatus.on_way) {
       throw new BadRequestException('Order is not accepted');
@@ -224,11 +233,11 @@ export class OrdersService {
         },
       },
     });
-    if (order?.carrier.user.id !== token.id) {
-      throw new BadRequestException('Forbidden resource');
-    }
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
+    }
+    if (order?.carrier.user.id !== token.id) {
+      throw new BadRequestException('Forbidden resource');
     }
     if (order.status !== OrderStatus.accepted) {
       throw new BadRequestException('Order is not accepted');
@@ -241,6 +250,7 @@ export class OrdersService {
    * Finishes shipping accepted order
    * @param req request to get token
    * @param id id of order to finish
+   * @param file
    * @returns {Promise<Order>} promise to return updated order
    */
   async finishShipping(
@@ -270,6 +280,11 @@ export class OrdersService {
     const fileUrl = await this.s3Service.uploadFile(file, bucketKey);
     order.status = OrderStatus.finished;
     order.acceptance_image = fileUrl;
+    const payment = await this.paymentRepo.findOne({ where: { order: order } });
+    payment.carrier = await this.carrierRepo.findOne({
+      where: { id: token.id },
+    });
+    await this.paymentRepo.save(payment);
     return this.orderRepo.save(order);
   }
 
