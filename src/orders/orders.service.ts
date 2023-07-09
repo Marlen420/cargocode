@@ -23,6 +23,7 @@ import { SocketGateway } from 'src/socket/socket.gateway';
 import { S3Service } from '../aws-s3/aws-s3.service';
 import { TrimbleService } from 'src/trimble/trimble.service';
 import { MailService } from '../mail/mail.service';
+import { PaymentEntity } from '../stripe/entities/payment.entity';
 
 /**
  * Interface of decoded user bearer token
@@ -46,6 +47,8 @@ export class OrdersService {
    * @param usersService users servuce
    * @param socketGateway
    * @param orderRepo order entity repository
+   * @param paymentRepo
+   * @param carrierRepo
    * @param s3Service
    * @param mailService
    */
@@ -58,6 +61,10 @@ export class OrdersService {
     private readonly socketGateway: SocketGateway,
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
+    @InjectRepository(PaymentEntity)
+    private readonly paymentRepo: Repository<PaymentEntity>,
+    @InjectRepository(CarrierEntity)
+    private readonly carrierRepo: Repository<CarrierEntity>,
     private s3Service: S3Service,
     private readonly mailService: MailService,
   ) {}
@@ -76,11 +83,6 @@ export class OrdersService {
     let price = distance * CONFIG.priceSystem.baseRatePerMile;
     price += +data.weight * CONFIG.priceSystem.weightFactorPerPound;
     return price;
-  }
-  async payOrder(req, orderId: number) {
-    const order = await this.orderRepo.findOne({ where: { id: orderId } });
-    order.status = OrderStatus.waiting;
-    return this.orderRepo.save(order);
   }
   /**
    * Creates new order
@@ -180,6 +182,14 @@ export class OrdersService {
     );
     return this.orderRepo.save(order);
   }
+  async orderToWaitStatusById(id: number) {
+    const order = await this.orderRepo.findOne({ where: { id } });
+    if (!order) {
+      throw new BadRequestException('Order not found');
+    }
+    order.status = OrderStatus.waiting;
+    return await this.orderRepo.save(order);
+  }
   async deliveredShipping(req: Request, id: number) {
     const token = this.getDecodedToken(req);
     const order = await this.orderRepo.findOne({
@@ -241,6 +251,7 @@ export class OrdersService {
    * Finishes shipping accepted order
    * @param req request to get token
    * @param id id of order to finish
+   * @param file
    * @returns {Promise<Order>} promise to return updated order
    */
   async finishShipping(
@@ -270,6 +281,11 @@ export class OrdersService {
     const fileUrl = await this.s3Service.uploadFile(file, bucketKey);
     order.status = OrderStatus.finished;
     order.acceptance_image = fileUrl;
+    const payment = await this.paymentRepo.findOne({ where: { order: order } });
+    payment.carrier = await this.carrierRepo.findOne({
+      where: { id: token.id },
+    });
+    await this.paymentRepo.save(payment);
     return this.orderRepo.save(order);
   }
 

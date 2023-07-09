@@ -77,12 +77,6 @@ export class OrdersController {
   async createOrder(@Req() req: Request, @Body() data: CreateOrderDto) {
     return this.ordersService.createOrder(req, data);
   }
-
-  @ApiOperation({ summary: 'Pay order' })
-  @Get('pay-order/:orderId')
-  async payOrder(@Req() req: Request, @Param('orderId') orderId: number) {
-    return this.ordersService.payOrder(req, orderId);
-  }
   @Roles(RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Accept order' })

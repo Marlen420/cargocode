@@ -5,7 +5,6 @@ import { MapboxModule } from 'src/mapbox/mapbox.module';
 import { MapboxService } from 'src/mapbox/mapbox.service';
 import { RedisModule } from 'src/redis/redis.module';
 import { RedisService } from 'src/redis/redis.service';
-import { SocketGateway } from 'src/socket/socket.gateway';
 import { SocketModule } from 'src/socket/socket.module';
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { OperatorEntity } from 'src/users/entities/operator.entity';
@@ -21,6 +20,7 @@ import { TrimbleService } from 'src/trimble/trimble.service';
 import { TrimbleModule } from 'src/trimble/trimble.module';
 import { MessagesModule } from 'src/messages/messages.module';
 import { MailModule } from '../mail/mail.module';
+import { PaymentEntity } from '../stripe/entities/payment.entity';
 
 @Module({
   imports: [
@@ -31,6 +31,8 @@ import { MailModule } from '../mail/mail.module';
       CarrierEntity,
       OperatorEntity,
       SocketModule,
+      PaymentEntity,
+      CarrierEntity,
     ]),
     MapboxModule,
     UsersModule,
