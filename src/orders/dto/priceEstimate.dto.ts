@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsNumber, IsString } from 'class-validator';
-import { IsNull } from 'typeorm';
 
 export class PriceEstimateDto {
   @ApiProperty({ example: 'Los Angeles' })
@@ -19,7 +18,7 @@ export class PriceEstimateDto {
   @IsDateString()
   delivery_date: Date;
 
-  @ApiProperty({ example: 88000 })
+  @ApiProperty({ example: '88000' })
   @IsString()
   weight: string;
 

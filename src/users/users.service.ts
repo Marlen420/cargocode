@@ -16,6 +16,7 @@ import { CreateOperatorDto } from './dto/create-operator.dto';
 import { OperatorEntity } from './entities/operator.entity';
 import { RolesEnum } from './enums/roles.enum';
 import { MailService } from '../mail/mail.service';
+
 const { v4: uuidv4 } = require('uuid');
 @Injectable()
 export class UsersService {
@@ -48,6 +49,7 @@ export class UsersService {
     ) {
       throw new BadRequestException('Employee not registered in company');
     }
+    dto.role = RolesEnum.OPERATOR;
     const user = await this.createUser(dto);
     const operator = this.operatorRepository.create({
       user,
@@ -58,6 +60,7 @@ export class UsersService {
   }
 
   async createShipper(dto: CreateShipperDto): Promise<ShipperEntity> {
+    dto.role = RolesEnum.SHIPPER;
     const user = await this.createUser(dto);
     const registeredShipper = await this.shipperRepository.save({
       billing_address: dto.billing_address,
@@ -81,6 +84,7 @@ export class UsersService {
         throw new BadRequestException('Carrier is not registered in company');
       }
     }
+    dto.role = RolesEnum.CARRIER;
     const user = await this.createUser(dto);
     const carrier = this.carrierRepository.create({
       physical_address: dto.physical_address,

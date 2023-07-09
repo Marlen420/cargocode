@@ -1,11 +1,11 @@
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { ShipperEntity } from 'src/users/entities/shipper.entity';
-import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Currency } from '../enums/currency.enum';
@@ -36,9 +36,9 @@ export class OrderEntity {
   @Column({ type: 'varchar', length: 256 })
   destination: string;
   @Column({ type: 'varchar', length: 20 })
-  origin_latitude: string;
+  pickup_latitude: string;
   @Column({ type: 'varchar', length: 20 })
-  origin_longitude: string;
+  pickup_longitude: string;
   @Column({ type: 'varchar', length: 20 })
   destination_latitude: string;
   @Column({ type: 'varchar', length: 20 })
