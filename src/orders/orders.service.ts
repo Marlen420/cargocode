@@ -21,7 +21,6 @@ import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { OrderStatus } from './enums/orderStatus.enum';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { S3Service } from '../aws-s3/aws-s3.service';
-import { ValidationError } from 'class-validator';
 import { TrimbleService } from 'src/trimble/trimble.service';
 import { MailService } from '../mail/mail.service';
 
@@ -68,7 +67,7 @@ export class OrdersService {
    * @param {PriceEstimateDto} data details of shipping
    * @returns {Promise<number>} price of shipping
    */
-  async priceEstimate(data: PriceEstimateDto) {
+  async priceEstimate(data: PriceEstimateDto): Promise<number> {
     const distance = await this.mapboxService.getDistance(
       data.pickup_location,
       data.destination,
@@ -108,10 +107,20 @@ export class OrdersService {
       location.start.Locations[0].Coords;
     const { Lat: destinationLat, Lon: destinationLon } =
       location.end.Locations[0].Coords;
-    order.origin_latitude = originLat;
-    order.origin_longitude = originLon;
+    order.pickup_latitude = originLat;
+    order.pickup_longitude = originLon;
     order.destination_latitude = destinationLat;
     order.destination_longitude = destinationLon;
+    order.price = await this.priceEstimate({
+      pickup_location: data.pickup_location,
+      destination: data.destination,
+      pickup_date: data.pickup_date,
+      delivery_date: data.delivery_date,
+      weight: data.weight,
+      type: data.type,
+      required_equipment: data.required_equipment,
+      special_instructions: data.special_instructions,
+    });
     Object.assign(order, data);
     const savedOrder = await this.orderRepo.save(order);
     await this.socketGateway.sendOrder(savedOrder);
@@ -163,8 +172,8 @@ export class OrdersService {
         <p>Weight: ${order.weight}</p>
         <p>Origin: ${order.pickup_location}</p>
         <p>Destination: ${order.destination}</p>
-        <p>Origin latitude: ${order.origin_latitude}</p>
-        <p>Origin longitude: ${order.origin_longitude}</p>
+        <p>Origin latitude: ${order.pickup_latitude}</p>
+        <p>Origin longitude: ${order.pickup_longitude}</p>
         <p>Destination latitude: ${order.destination_latitude}</p>
         <p>Destination longitude: ${order.destination_longitude}</p>
         `,
