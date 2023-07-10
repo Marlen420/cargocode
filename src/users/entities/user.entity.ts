@@ -1,8 +1,15 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { RolesEnum } from '../enums/roles.enum';
 import { CarrierEntity } from './carrier.entity';
 import { OperatorEntity } from './operator.entity';
 import { ShipperEntity } from './shipper.entity';
+import { RatingEntity } from '../../rating/entities/rating.entity';
 
 @Entity()
 export class UserEntity {

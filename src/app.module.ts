@@ -17,6 +17,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { MessagesModule } from './messages/messages.module';
 import { MailModule } from './mail/mail.module';
+import { RatingModule } from './rating/rating.module';
 
 config();
 @Module({
@@ -48,6 +49,7 @@ config();
     AwsS3Module,
     MessagesModule,
     MailModule,
+    RatingModule,
   ],
   controllers: [StripeController],
   providers: [

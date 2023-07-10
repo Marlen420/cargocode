@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { PaymentEntity } from '../../stripe/entities/payment.entity';
+import { RatingEntity } from '../../rating/entities/rating.entity';
 @Entity()
 export class ShipperEntity {
   @PrimaryGeneratedColumn()
@@ -23,4 +24,6 @@ export class ShipperEntity {
   user: UserEntity;
   @OneToMany(() => PaymentEntity, (payment) => payment.shipper)
   payments: PaymentEntity[];
+  @OneToMany(() => RatingEntity, (rating) => rating.shipper)
+  ratings: RatingEntity[];
 }
