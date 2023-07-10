@@ -24,10 +24,8 @@ export class CarrierEntity {
   orders: OrderEntity[];
   @ManyToOne(() => CompanyEntity, (e) => e.carriers, { nullable: true })
   company: CompanyEntity;
-  @OneToOne(() => PaymentEntity, (payment) => payment.carrier, {
-    nullable: true,
-  })
-  payments: PaymentEntity;
+  @OneToMany(() => PaymentEntity, (payment) => payment.carrier)
+  payments: PaymentEntity[];
   @OneToOne(() => UserEntity, (user) => user.carrier)
   @JoinColumn()
   user: UserEntity;
