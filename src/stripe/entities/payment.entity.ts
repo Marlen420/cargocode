@@ -19,10 +19,12 @@ export class PaymentEntity {
   @OneToOne(() => OrderEntity)
   @JoinColumn()
   order: OrderEntity;
-  @OneToOne(() => CarrierEntity, { nullable: true })
+  @OneToOne(() => CarrierEntity, (carrier) => carrier.payments, {
+    nullable: true,
+  })
   @JoinColumn()
   carrier: CarrierEntity;
-  @OneToOne(() => ShipperEntity)
+  @OneToOne(() => ShipperEntity, (shipper) => shipper.payments)
   @JoinColumn()
   shipper: ShipperEntity;
 }

@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { PaymentEntity } from '../../stripe/entities/payment.entity';
 @Entity()
 export class ShipperEntity {
   @PrimaryGeneratedColumn()
@@ -20,4 +21,6 @@ export class ShipperEntity {
   @OneToOne(() => UserEntity, (user) => user.shipper)
   @JoinColumn()
   user: UserEntity;
+  @OneToOne(() => PaymentEntity, (payment) => payment.shipper)
+  payments: PaymentEntity;
 }
