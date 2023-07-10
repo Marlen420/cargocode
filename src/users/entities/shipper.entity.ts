@@ -21,6 +21,6 @@ export class ShipperEntity {
   @OneToOne(() => UserEntity, (user) => user.shipper)
   @JoinColumn()
   user: UserEntity;
-  @OneToOne(() => PaymentEntity, (payment) => payment.shipper)
-  payments: PaymentEntity;
+  @OneToMany(() => PaymentEntity, (payment) => payment.shipper)
+  payments: PaymentEntity[];
 }

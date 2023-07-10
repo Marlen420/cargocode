@@ -1,7 +1,7 @@
 import {
   Column,
   Entity,
-  JoinColumn,
+  JoinColumn, ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -19,12 +19,10 @@ export class PaymentEntity {
   @OneToOne(() => OrderEntity)
   @JoinColumn()
   order: OrderEntity;
-  @OneToOne(() => CarrierEntity, (carrier) => carrier.payments, {
+  @ManyToOne(() => CarrierEntity, (carrier) => carrier.payments, {
     nullable: true,
   })
-  @JoinColumn()
   carrier: CarrierEntity;
-  @OneToOne(() => ShipperEntity, (shipper) => shipper.payments)
-  @JoinColumn()
+  @ManyToOne(() => ShipperEntity, (shipper) => shipper.payments)
   shipper: ShipperEntity;
 }
