@@ -131,7 +131,7 @@ export class OrdersController {
   @Roles(RolesEnum.SHIPPER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Enables order' })
-  @Patch('enalbe-order/:id')
+  @Patch('enable-order/:id')
   async enableOrder(
     @Req() req: Request,
     @Param('id') id: string,

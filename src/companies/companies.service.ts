@@ -83,15 +83,14 @@ export class CompaniesService {
     const company = await this.companyRepository.findOne({
       where: { id: token.id },
     });
-    console.log(company,'company');
-    // if (
-    //   company.employees_credential.some(
-    //     (item: AddEmployeeDto) =>
-    //       item.email === data.email || item.phone === data.phone,
-    //   )
-    // ) {
-    //   throw new BadRequestException('Credential already added');
-    // }
+    if (
+      company.employees_credential.some(
+        (item: AddEmployeeDto) =>
+          item.email === data.email || item.phone === data.phone,
+      )
+    ) {
+      throw new BadRequestException('Credential already added');
+    }
     company.employees_credential.push(data);
     return this.companyRepository.save(company);
   }

@@ -280,9 +280,9 @@ export class OrdersService {
     const fileUrl = await this.s3Service.uploadFile(file, bucketKey);
     order.status = OrderStatus.finished;
     order.acceptance_image = fileUrl;
-    const payment = await this.paymentRepo.findOne({ where: { order: order } });
+    const payment = await this.paymentRepo.findOne({ where: { order: {id:order.id} } });
     payment.carrier = await this.carrierRepo.findOne({
-      where: { id: token.id },
+      where: { id: order.carrier.id },
     });
     await this.paymentRepo.save(payment);
     return this.orderRepo.save(order);
