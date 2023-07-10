@@ -154,13 +154,7 @@ export class UsersService {
     }
     const salt = await bcrypt.genSalt(10);
     dto.password = await bcrypt.hash(dto.password, salt);
-    return await this.userRepository.save(dto).then(async (savedUser) => {
-      await this.redisService.set(
-        `users:userService:user:${savedUser.id}`,
-        savedUser,
-      );
-      return savedUser;
-    });
+    return await this.userRepository.save(dto);
   }
   async findAll(): Promise<UserEntity[]> {
     return await this.userRepository.find({
@@ -180,7 +174,6 @@ export class UsersService {
     });
   }
   async findShipperByUserId(id: number) {
-    console.log(id);
     const shipper = await this.shipperRepository.findOne({
       where: { user: { id } },
     });

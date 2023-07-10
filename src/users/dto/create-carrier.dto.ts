@@ -43,7 +43,7 @@ export class CreateCarrierDto {
   @IsString()
   mc_dot_number: string;
 
-  @ApiProperty()
+  @ApiProperty({nullable:true})
   @IsNumber()
   company_id: number;
 }
