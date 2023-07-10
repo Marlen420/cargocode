@@ -29,6 +29,7 @@ import { PriceEstimateDto } from './dto/priceEstimate.dto';
 import { OrderEntity } from './entities/order.entity';
 import { OrdersService } from './orders.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { OrderStatus } from './enums/orderStatus.enum';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
@@ -49,17 +50,20 @@ export class OrdersController {
   // @Roles(RolesEnum.COMPANY, RolesEnum.OPERATOR, RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all orders' })
+  @ApiQuery({name: 'status', required: false})
   @Get()
-  async getOrders(): Promise<OrderEntity[]> {
-    return this.ordersService.getOrders();
+  async getOrders(@Query('status') status: OrderStatus): Promise<OrderEntity[]> {
+    return this.ordersService.getOrders(status);
   }
 
   @Roles(RolesEnum.SHIPPER, RolesEnum.CARRIER)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get my orders' })
+  @ApiQuery({name: 'status', required: false})
   @Get('my-orders')
-  async getMyOrders(@Req() req: Request) {
-    return this.ordersService.getMyOrders(req);
+  async getMyOrders(@Req() req: Request, @Query('status') status: OrderStatus) {
+    console.log('Status: ' ,status);
+    return this.ordersService.getMyOrders(req, status);
   }
 
   @Roles('ALL')

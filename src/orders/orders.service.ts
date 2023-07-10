@@ -9,7 +9,7 @@ import { MapboxService } from 'src/mapbox/mapbox.service';
 import { DistanceUnit } from 'src/mapbox/enums/distanceUnit.enum';
 import CONFIG from 'src/config';
 import { OrderEntity } from './entities/order.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/createOrder.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
@@ -386,8 +386,8 @@ export class OrdersService {
    * Returns array of orders
    * @returns {Promise<OrderEntity[]>} array of orders
    */
-  async getOrders(): Promise<OrderEntity[]> {
-    const orders = await this.orderRepo.find({
+  async getOrders(status?: OrderStatus): Promise<OrderEntity[]> {
+    const query = {
       relations: {
         shipper: {
           user: true,
@@ -396,7 +396,11 @@ export class OrdersService {
           user: true,
         },
       },
-    });
+    };
+    if (status) {
+      query['where'] = {status};
+    }
+    const orders = await this.orderRepo.find(query);
 
     return orders;
   }
@@ -407,7 +411,11 @@ export class OrdersService {
    * @returns {Promise<OrderEntity>} order
    */
   async getOrderById(id: number): Promise<OrderEntity> {
-    const order: OrderEntity = await this.orderRepo.findOne({ where: { id } });
+    const order: OrderEntity = await this.orderRepo.findOne({ where: { id } ,relations:{
+      shipper:{
+        user:true
+      }
+    }});
     if (!order) {
       throw new BadRequestException("Order doesn't exist");
     }
@@ -420,7 +428,7 @@ export class OrdersService {
    * @param {RolesEnum} role role of user
    * @returns {Promise<OrderEntity[]>} promsie to return array of user orders
    */
-  async getMyOrders(req: Request): Promise<OrderEntity[]> {
+  async getMyOrders(req: Request, status?: OrderStatus): Promise<OrderEntity[]> {
     const token = this.getDecodedToken(req);
     if (token.role === RolesEnum.CARRIER) {
       const carrier = await this.usersService.findOneCarrier(token.id, {
@@ -434,7 +442,11 @@ export class OrdersService {
     const shipper = await this.usersService.findOneShipper(token.id, {
       user: false,
     });
-    return this.orderRepo.find({ where: { shipper: { id: shipper.id } } });
+    const query = { where: { shipper: { id: shipper.id } } };
+    if (status) {
+      query.where['status'] = In([...status]);
+    }
+    return this.orderRepo.find(query);
   }
 
   private getDecodedToken(req: Request): UserToken {

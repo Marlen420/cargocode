@@ -34,7 +34,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Create a new operator' })
-  @ApiBody({ type: CreateCarrierDto })
+  @ApiBody({ type: CreateOperatorDto })
   @ApiResponse({
     status: 201,
     description: 'Operator has been successfully created',

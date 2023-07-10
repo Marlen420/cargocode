@@ -12,6 +12,7 @@ import { UsersService } from 'src/users/users.service';
 import { MessageEntity } from './entities/message.entity';
 import { MessagesService } from './messages.service';
 import { MailModule } from '../mail/mail.module';
+import { MessagesController } from './messages.controller';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MailModule } from '../mail/mail.module';
     MailModule,
   ],
   providers: [MessagesService, UsersService],
+  controllers: [MessagesController],
   exports: [MessagesService],
 })
 export class MessagesModule {}
