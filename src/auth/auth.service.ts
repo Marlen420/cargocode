@@ -31,7 +31,9 @@ export class AuthService {
         return { access_token: this.jwtService.sign({ ...user }) };
       }
     }
-    const company: CompanyEntity = await this.companiesService.findByEmail(data.login);
+    const company: CompanyEntity = await this.companiesService.findByEmail(
+      data.login,
+    );
     if (company) {
       const passwordValid = await bcrypt.compare(password, company.password);
       if (passwordValid) {
@@ -44,7 +46,7 @@ export class AuthService {
 
   isEmail(login: string): boolean {
     const reg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-    if (reg.test(login)) {  
+    if (reg.test(login)) {
       return true;
     }
     return false;

@@ -21,7 +21,7 @@ export class CompanyEntity {
   email: string;
   @Column()
   password: string;
-  @Column('jsonb', {nullable: true})
+  @Column('jsonb', { nullable: true })
   employees_credential: AddEmployeeDto[];
   @OneToMany(() => CarrierEntity, (carrier) => carrier.company, { eager: true })
   carriers: CarrierEntity[];

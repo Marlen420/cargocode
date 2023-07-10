@@ -88,6 +88,7 @@ export class StripeService {
     payment.order = order;
     payment.total = data.total;
     payment.date = new Date();
+    console.log(payment);
     await this.ordersService.orderToWaitStatusById(data.orderId);
     return await this.paymentRepo.save(payment);
   }
