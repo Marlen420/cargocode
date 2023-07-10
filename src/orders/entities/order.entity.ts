@@ -5,11 +5,13 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Currency } from '../enums/currency.enum';
 import { OrderStatus } from '../enums/orderStatus.enum';
+import { RatingEntity } from '../../rating/entities/rating.entity';
 
 @Entity()
 export class OrderEntity {
@@ -61,4 +63,6 @@ export class OrderEntity {
   active: boolean;
   @Column({ type: 'varchar', nullable: true })
   acceptance_image: string;
+  @OneToMany(() => RatingEntity, (rating) => rating.order)
+  ratings: RatingEntity[];
 }

@@ -39,7 +39,6 @@ export class RolesGuard implements CanActivate {
         (role) => role === 'ALL' || role === decodedToken.role,
       );
     } catch (err) {
-      console.log('Error: ', err);
       throw new UnauthorizedException();
     }
   }
