@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { RolesEnum } from '../enums/roles.enum';
 import { CarrierEntity } from './carrier.entity';
@@ -15,6 +17,10 @@ import { RatingEntity } from '../../rating/entities/rating.entity';
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)'})
+  created_at: Date;
+  @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+  updated_at: Date;
   @Column()
   firstname: string;
   @Column()
@@ -33,6 +39,6 @@ export class UserEntity {
   carrier: CarrierEntity;
   @OneToOne(() => ShipperEntity, (e) => e.user, { nullable: true })
   shipper: ShipperEntity;
-  @OneToOne(() => OperatorEntity, (e) => e.user, { nullable: true })
+  @OneToOne(() => OperatorEntity, (e) => e.user, { nullable: true, onDelete: 'CASCADE' })
   operator: OperatorEntity;
 }

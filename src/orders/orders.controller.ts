@@ -62,7 +62,6 @@ export class OrdersController {
   @ApiQuery({name: 'status', required: false})
   @Get('my-orders')
   async getMyOrders(@Req() req: Request, @Query('status') status: OrderStatus) {
-    console.log('Status: ' ,status);
     return this.ordersService.getMyOrders(req, status);
   }
 
@@ -152,5 +151,11 @@ export class OrdersController {
     @Param('id') id: string,
   ): Promise<OrderEntity> {
     return this.ordersService.disableOrder(req, +id);
+  }
+
+  @ApiOperation({ summary: 'Get last location of carrier' })
+  @Get(':id')
+  async getLastLocation(@Param('id') id: string) {
+    return this.ordersService.getLastLocations(+id);
   }
 }

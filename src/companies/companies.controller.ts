@@ -30,19 +30,16 @@ export class CompaniesController {
     return this.companiesService.findAll();
   }
 
+  @Roles(RolesEnum.COMPANY)
+  @UseGuards(RolesGuard)
+  @Get('employees')
+  async getEmployees(@Req() req: Request) {
+    return this.companiesService.getEmployees(req);
+  }
+
   @Post('create-company')
   async createCompany(@Body() data: CreateCompanyDto): Promise<CompanyEntity> {
     return this.companiesService.createCompany(data);
-  }
-
-  @Roles(RolesEnum.COMPANY)
-  @UseGuards(RolesGuard)
-  @Post('add-employee')
-  async addCarrier(
-    @Req() req: Request,
-    @Body() data: AddEmployeeDto,
-  ): Promise<CreateCompanyDto> {
-    return this.companiesService.addEmployee(req, data);
   }
 
   @Delete(':id')

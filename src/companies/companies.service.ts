@@ -70,32 +70,6 @@ export class CompaniesService {
   }
 
   /**
-   * Adds employee to company
-   */
-  async addEmployee(
-    req: Request,
-    data: AddEmployeeDto,
-  ): Promise<CompanyEntity> {
-    const token: UserToken = this.getDecodedToken(req);
-    if (!data.email && !data.phone) {
-      throw new BadRequestException('Must be provided at least one option');
-    }
-    const company = await this.companyRepository.findOne({
-      where: { id: token.id },
-    });
-    if (
-      company.employees_credential.some(
-        (item: AddEmployeeDto) =>
-          item.email === data.email || item.phone === data.phone,
-      )
-    ) {
-      throw new BadRequestException('Credential already added');
-    }
-    company.employees_credential.push(data);
-    return this.companyRepository.save(company);
-  }
-
-  /**
    * Deletes company by provided id
    */
   async deleteById(id: number): Promise<DeleteResult> {
@@ -104,6 +78,18 @@ export class CompaniesService {
       throw new BadRequestException('Company not found');
     }
     return this.companyRepository.delete(id);
+  }
+
+  async getEmployees(req: Request) {
+    const token = this.getDecodedToken(req);
+    const company = await this.companyRepository.findOne({where: {id: token.id}, relations: {carriers: {user: true}, operators: {user: true}}});
+    if (!company) {
+      throw new BadRequestException('Company not found!');
+    }
+    return {
+      operators: company.operators,
+      carriers: company.carriers
+    }
   }
 
   private getDecodedToken(req: Request): UserToken {

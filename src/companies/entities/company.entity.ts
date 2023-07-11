@@ -1,12 +1,17 @@
 import { CarrierEntity } from 'src/users/entities/carrier.entity';
 import { RolesEnum } from 'src/users/enums/roles.enum';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { AddEmployeeDto } from '../dto/add-employee.dto';
+import { OperatorEntity } from 'src/users/entities/operator.entity';
 
 @Entity()
 export class CompanyEntity {
   @PrimaryGeneratedColumn()
   id: number;
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)'})
+  created_at: Date;
+  @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+  updated_at: Date;
   @Column({ default: RolesEnum.COMPANY })
   role: RolesEnum;
   @Column()
@@ -21,8 +26,9 @@ export class CompanyEntity {
   email: string;
   @Column()
   password: string;
-  @Column('jsonb', { nullable: true })
-  employees_credential: AddEmployeeDto[];
   @OneToMany(() => CarrierEntity, (carrier) => carrier.company, { eager: true })
   carriers: CarrierEntity[];
+  @OneToMany(() => OperatorEntity, (operator) => operator.company, { eager: true })
+  operators: OperatorEntity[];
+  
 }

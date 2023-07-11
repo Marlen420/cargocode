@@ -400,8 +400,20 @@ export class OrdersService {
     if (status) {
       query['where'] = {status};
     }
-    const orders = await this.orderRepo.find(query);
-
+    let orders;
+    // let redisKey = 'orders:ordersService:status';
+    // if (Array.isArray(status)) {
+    //   status.map((item) => redisKey += `:${item}`);
+    // }
+    // else {
+    //   redisKey += `:${status}`;
+    // }
+    // orders = await this.redisService.get(redisKey);
+    // if (orders) {
+    //   return orders;
+    // }
+    orders = await this.orderRepo.find(query);
+    // await this.redisService.set(redisKey, orders);
     return orders;
   }
 
@@ -429,6 +441,13 @@ export class OrdersService {
    * @returns {Promise<OrderEntity[]>} promsie to return array of user orders
    */
   async getMyOrders(req: Request, status?: OrderStatus): Promise<OrderEntity[]> {
+    let statusSuffix = '';
+    if (Array.isArray(status)) {
+      status.forEach((item) => statusSuffix += `:${item}`);
+    }
+    else {
+      statusSuffix += `:${status}`;
+    }
     const token = this.getDecodedToken(req);
     if (token.role === RolesEnum.CARRIER) {
       const carrier = await this.usersService.findOneCarrier(token.id, {
@@ -437,16 +456,38 @@ export class OrdersService {
       if (!carrier) {
         throw new BadRequestException("Carrier doesn't exist");
       }
-      return this.orderRepo.find({ where: { carrier: { id: carrier.id } } });
+      let orders;
+      // let redisKey = 'orders:ordersService:carriers:status' + statusSuffix;
+      // orders = await this.redisService.get(redisKey);
+      // if (orders) {
+      //   return orders;
+      // }
+      orders = this.orderRepo.find({ where: { carrier: { id: carrier.id }}});      
+      // await this.redisService.set(redisKey, orders);
+      return orders;
     }
     const shipper = await this.usersService.findOneShipper(token.id, {
       user: false,
     });
-    const query = { where: { shipper: { id: shipper.id } } };
+    const query = { where: { shipper: { id: shipper.id } }, relations: { shipper: { user: true }, carrier: { user: true }} };
     if (status) {
       query.where['status'] = In([...status]);
     }
+
     return this.orderRepo.find(query);
+  }
+
+  /**
+   * Returns last location of carrier saved in redis
+   */
+  async getLastLocations(id: number) {
+    const data = await this.redisService.get(`orders:navigation:${id}`);
+    if (data) {
+      return data;
+    }
+    return {
+      message: 'Not found last location'
+    };
   }
 
   private getDecodedToken(req: Request): UserToken {

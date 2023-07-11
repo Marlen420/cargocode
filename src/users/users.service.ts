@@ -41,19 +41,12 @@ export class UsersService {
     if (!company) {
       throw new BadRequestException('Company not found');
     }
-    if (
-      !company.employees_credential.some(
-        (item: AddEmployeeDto) =>
-          item.email === dto.email || item.phone === dto.phone,
-      )
-    ) {
-      throw new BadRequestException('Employee not registered in company');
-    }
     dto.role = RolesEnum.OPERATOR;
     const user = await this.createUser(dto);
     const operator = this.operatorRepository.create({
       user,
     });
+    operator.company = company;
     const registeredOperator = await this.operatorRepository.save(operator);
     delete registeredOperator.user.password;
     return registeredOperator;
@@ -71,19 +64,7 @@ export class UsersService {
   }
 
   async createCarrier(dto: CreateCarrierDto): Promise<CarrierEntity> {
-    let company: CompanyEntity = null;
-    if (dto.company_id !== -1) {
-      company = await this.companiesService.findById(dto.company_id);
-      if (
-        company &&
-        !company.employees_credential.some(
-          (item: AddEmployeeDto) =>
-            item.email === dto.email || item.phone === dto.phone,
-        )
-      ) {
-        throw new BadRequestException('Carrier is not registered in company');
-      }
-    }
+    const company: CompanyEntity = dto.company_id ? await this.companiesService.findById(dto.company_id) : null;
     dto.role = RolesEnum.CARRIER;
     const user = await this.createUser(dto);
     const carrier = this.carrierRepository.create({
