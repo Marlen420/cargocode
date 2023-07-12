@@ -26,9 +26,7 @@ export class SocketGateway {
   constructor(
     private readonly messagesService: MessagesService,
     private readonly redisService: RedisService
-  ) {
-    console.log('Running socket');
-  }
+  ) {}
 
   async handleConnection(client: Socket) {}
 

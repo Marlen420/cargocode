@@ -6,7 +6,6 @@ import { UserEntity } from './entities/user.entity';
 import { ShipperEntity } from './entities/shipper.entity';
 import { CarrierEntity } from './entities/carrier.entity';
 import { RedisModule } from 'src/redis/redis.module';
-import { RedisService } from 'src/redis/redis.service';
 import { CompaniesService } from 'src/companies/companies.service';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { CompanyEntity } from 'src/companies/entities/company.entity';
@@ -29,7 +28,7 @@ import { MailModule } from '../mail/mail.module';
     MailModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, RedisService, CompaniesService],
+  providers: [UsersService],
   exports: [UsersService],
 })
 export class UsersModule {}

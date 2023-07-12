@@ -53,7 +53,6 @@ config();
   ],
   controllers: [StripeController],
   providers: [
-    RedisService,
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
